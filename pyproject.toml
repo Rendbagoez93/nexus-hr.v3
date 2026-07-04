@@ -1,0 +1,57 @@
+[project]
+name = "nexus-hr-v3"
+version = "0.1.2"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14.3"
+dependencies = [
+    "django>=6.0.5",
+    "django-filter>=25.2",
+    "djangorestframework>=3.17.1",
+    "djangorestframework-simplejwt>=5.5.1",
+    "drf-pydantic>=2.9.1",
+    "psycopg[binary]>=3.3.4",
+    "pydantic-extra-types>=2.11.1",
+    "pydantic-settings>=2.14.1",
+    "pydantic[email]>=2.13.4",
+    "python-dateutil>=2.9.0",
+    "django-storages[s3]>=1.14",
+    "celery[redis]>=5.6",
+    "django-celery-beat>=2.7",
+    "django-celery-results>=2.5",
+    "redis>=5.0",
+    "structlog>=25.5",
+    "django-structlog[celery]>=10.0",
+    "sentry-sdk[django]>=2.20",
+    "structlog-sentry>=1.2",
+    "drf-spectacular>=0.29.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest-django>=4.9",
+    "factory-boy>=3.3",
+    "freezegun>=1.5",
+    "django-debug-toolbar>=4.4",
+    "black>=23.3.0",
+    "ruff>=0.9.0",
+    "pytest-cov>=7.1.0",
+    "pytest-xdist>=3.8.0",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.local"
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+testpaths = ["apps", "tests"]
+addopts = "--reuse-db -x --cov=apps --cov-report=term-missing -n auto --dist loadscope"
+markers = [
+    "unit: Unit test — single function/class, no DB or network I/O.",
+    "integration: Integration test — multiple components, DB, services, or Celery tasks.",
+    "feature: Feature test — full HTTP request/response cycle via DRF APIClient.",
+]
+
+# ---------------------------------------------------------------------------
+# pytest — Run: pytest (requires pip install ".[dev]" to include pytest-xdist)
+# ---------------------------------------------------------------------------

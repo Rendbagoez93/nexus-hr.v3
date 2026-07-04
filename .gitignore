@@ -1,0 +1,130 @@
+# ============================================================================
+# Nexus HR — .gitignore
+# ============================================================================
+
+# ── Python ──────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ── Virtual Environments ────────────────────────────────────────────────────
+.venv/
+venv/
+ENV/
+env/
+.virtualenv/
+
+# ── Django ──────────────────────────────────────────────────────────────────
+# Database
+db.sqlite3
+db.sqlite3-journal
+*.sqlite3
+
+# Static files (collected by collectstatic)
+/staticfiles/
+/static_root/
+
+# Media files (user uploads)
+/media/
+
+# Django secret key
+local_settings.py
+
+# ── Environment Variables ───────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── IDE & Editor ────────────────────────────────────────────────────────────
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+.idea_modules/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# ── Testing & Coverage ──────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+*.cover
+.cache
+nosetests.xml
+coverage.xml
+*.mo
+*.pot
+
+# ── Logs ────────────────────────────────────────────────────────────────────
+*.log
+logs/
+*.log.*
+
+# ── Docker ──────────────────────────────────────────────────────────────────
+docker-compose.override.yml
+
+# ── OS-Specific ─────────────────────────────────────────────────────────────
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ── Celery ──────────────────────────────────────────────────────────────────
+celerybeat-schedule
+celerybeat.pid
+
+# ── Documentation ───────────────────────────────────────────────────────────
+docs/_build/
+site/
+
+# ── Misc ────────────────────────────────────────────────────────────────────
+*.bak
+*.tmp
+.ruff_cache/
