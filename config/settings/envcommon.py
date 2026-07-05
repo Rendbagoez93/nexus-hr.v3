@@ -18,19 +18,31 @@ class EnvCommon(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        case_sensitive=False,
+        case_sensitive=True,
         extra="ignore",
     )
 
-    # ── Django ─────────────────────────────────────────────────────────────────
-    secret_key: str = Field(default="change-me-in-production")
-    debug: bool = Field(default=False)
-    allowed_hosts: str = Field(default="localhost,127.0.0.1")
+    # ── Django Core ──────────────────────────────────────────────────────────
+    SECRET_KEY: str = Field(
+        default="django-insecure-change-me-in-production",
+        description="Django secret key. Must be unique and unpredictable in production.",
+    )
+    DEBUG: bool = Field(default=False, description="Never True in production.")
+    ALLOWED_HOSTS: list[str] = Field(
+        default=["localhost", "127.0.0.1"],
+        description="Hosts/domains the Django site can serve.",
+    )
+    DJANGO_SETTINGS_MODULE: str = Field(
+        default="config.settings.local",
+        description="Active settings module. Override in production.",
+    )
 
-    # ── Database ───────────────────────────────────────────────────────────────
-    # PostgreSQL via Docker (see docker-compose.yml)
-    # Port 5433 to avoid conflict with local PostgreSQL on 5432
-    database_url: str = Field(default="postgresql://postgres:postgres@localhost:5433/nexus_hr")
+    # ── Database — PostgreSQL via psycopg v3 ─────────────────────────────────
+    DB_NAME: str = Field(default="nexus_hr", description="PostgreSQL database name.")
+    DB_USER: str = Field(default="postgres", description="PostgreSQL role/user.")
+    DB_PASSWORD: str = Field(default="postgres", description="PostgreSQL password.")
+    DB_HOST: str = Field(default="localhost", description="PostgreSQL host.")
+    DB_PORT: int = Field(default=5433, description="PostgreSQL port.")
 
     # ── Redis ──────────────────────────────────────────────────────────────────
     # Uncomment redis service in docker-compose.yml to enable caching

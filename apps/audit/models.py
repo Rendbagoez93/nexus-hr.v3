@@ -1,8 +1,3 @@
-"""
-apps/core/models/audit.py
-
-Audit log — append-only record of all data changes.
-"""
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -12,11 +7,6 @@ from apps.shared.mixins.timestamped import TimestampedModel
 
 
 class AuditLog(TimestampedModel):
-    """
-    Append-only audit trail for all tracked model changes.
-
-    Uses ContentType + GenericForeignKey for flexible referencing of any model.
-    """
 
     ACTION_CHOICES = [
         ("CREATE", "Created"),
@@ -37,7 +27,7 @@ class AuditLog(TimestampedModel):
     after_data = models.JSONField(null=True, blank=True)
 
     class Meta:
-        db_table = "core_audit_log"
+        db_table = "audit_audit_log"
         ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["table_name", "record_id"]),

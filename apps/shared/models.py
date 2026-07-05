@@ -1,8 +1,10 @@
 """
 apps/shared/models.py
 
-Shared app has no models of its own — all shared models live in apps/core/
-but the abstract bases (TenantModel, SoftDeleteMixin, TimestampedModel) live here.
+Abstract base models for tenant-scoped entities:
+- TenantModel (company FK + TenantManager + soft delete + timestamps)
+- TenantQuerySet (auto-filters by company)
+- TenantManager (.for_company() and .alive() methods)
 """
 
 from django.db import models
@@ -23,7 +25,7 @@ class TenantModel(SoftDeleteMixin, TimestampedModel):
     """
 
     company = models.ForeignKey(
-        "core.Company",
+        "companies.Company",
         on_delete=models.CASCADE,
         related_name="%(class)ss",
         db_index=True,

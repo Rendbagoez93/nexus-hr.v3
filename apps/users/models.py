@@ -1,13 +1,14 @@
 """
-apps/core/models/user.py
+apps/users/models.py
 
-AuthUser — custom user model extending AbstractBaseUser.
+AuthUser and RefreshToken.
 """
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
 from apps.shared.mixins.timestamped import TimestampedModel
+from apps.users.choices import ROLE_CHOICES
 
 
 class AuthUserManager(BaseUserManager):
@@ -31,26 +32,10 @@ class AuthUserManager(BaseUserManager):
 
 
 class AuthUser(AbstractBaseUser, PermissionsMixin, TimestampedModel):
-    """
-    Custom user model for Nexus.
-
-    - Email is the login identifier (unique)
-    - Role controls permission level
-    - company FK links to tenant (nullable for platform admins)
-    """
-
-    ROLE_CHOICES = [
-        ("platform_admin", "Platform Admin"),
-        ("hr_admin", "HR Admin"),
-        ("manager", "Manager"),
-        ("employee", "Employee"),
-        ("hse_officer", "HSE Officer"),
-    ]
-
     email = models.EmailField(unique=True, db_index=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="employee")
     company = models.ForeignKey(
-        "core.Company",
+        "companies.Company",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
@@ -65,7 +50,7 @@ class AuthUser(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     REQUIRED_FIELDS: list[str] = []
 
     class Meta:
-        db_table = "core_auth_user"
+        db_table = "users_auth_user"
         ordering = ["email"]
 
     def __str__(self) -> str:
@@ -73,14 +58,8 @@ class AuthUser(AbstractBaseUser, PermissionsMixin, TimestampedModel):
 
 
 class RefreshToken(models.Model):
-    """
-    Tracks issued refresh tokens for revocation support.
-
-    The actual token is stored as a one-way hash in `token_hash`.
-    """
-
     user = models.ForeignKey(
-        "core.AuthUser",
+        "users.AuthUser",
         on_delete=models.CASCADE,
         related_name="refresh_tokens",
     )
@@ -91,7 +70,7 @@ class RefreshToken(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = "core_refresh_token"
+        db_table = "users_refresh_token"
         indexes = [
             models.Index(fields=["user", "device_id"]),
             models.Index(fields=["user", "is_revoked"]),

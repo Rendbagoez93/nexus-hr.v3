@@ -21,7 +21,7 @@
 
 ### Tasks
 
-- [ ] Django project structure with app separation: `apps/core`, `apps/attendance`, `apps/hse`, `apps/payroll`
+- [ ] Django project structure with app separation: `apps/companies`, `apps/users`, `apps/audit`, `apps/departments`, `apps/documents`, `apps/attendance`, `apps/hse`, `apps/payroll`
 - [ ] `apps/shared/` with cross-module utilities:
   - `utils/dates.py` — `get_current_utc_datetime()`, `get_current_date()`, `days_until()`, `is_date_expired()`
   - `utils/ids.py` — `generate_uuid()`, `generate_emp_number()`
@@ -56,8 +56,8 @@
 - [ ] `SubscriptionPlan` model — `has_attendance`, `has_hse`, `has_payroll` flags
 - [ ] `CompanySubscription` model — links company to plan, billing period, active employee count
 - [ ] Django Admin registration for all three models
-- [ ] `apps/core/constants.py` — all business constants (BPJS rates, PTKP values, etc.)
-- [ ] `apps/core/choices.py` — all TextChoices classes
+- [ ] `apps/companies/constants.py` — all business constants (BPJS rates, PTKP values, etc.)
+- [ ] `apps/companies/choices.py` — all TextChoices classes
 
 ### Done When
 
@@ -83,8 +83,8 @@
 - [ ] `POST /api/v1/auth/token/refresh` — refresh access token
 - [ ] `POST /api/v1/auth/logout` — revoke refresh token
 - [ ] `POST /api/v1/auth/password/change` — change own password
-- [ ] `LoginSchema` in `apps/core/schemas.py`
-- [ ] Auth service in `apps/core/services/auth.py`
+- [ ] `LoginSchema` in `apps/users/schemas.py`
+- [ ] Auth service in `apps/users/services/auth.py`
 - [ ] `TenantMiddleware` update: extract `company_id` from JWT payload
 - [ ] Platform Admin: created via `manage.py createsuperuser` only — never JWT for HR dashboard
 
@@ -110,7 +110,7 @@
   - `GET /api/v1/departments/{id}`
   - `PATCH /api/v1/departments/{id}`
   - `DELETE /api/v1/departments/{id}` — soft delete
-- [ ] Department service in `apps/core/services/department.py`
+- [ ] Department service in `apps/departments/services/department.py`
 - [ ] Serializer with nested children for org-chart
 - [ ] `DepartmentCreateSchema`, `DepartmentUpdateSchema`
 
@@ -135,7 +135,7 @@
   - `GET /api/v1/positions/{id}`
   - `PATCH /api/v1/positions/{id}`
   - `DELETE /api/v1/positions/{id}` — soft delete
-- [ ] Position service in `apps/core/services/position.py`
+- [ ] Position service in `apps/departments/services/position.py`
 - [ ] `select_related("department")` to avoid N+1
 
 ### Done When
@@ -163,7 +163,7 @@
   - `POST /api/v1/employees/{id}/deactivate` — change status + resign_date
 - [ ] Self-service: `GET /api/v1/me`
 - [ ] `EmployeeCreateSchema`, `EmployeeUpdateSchema`
-- [ ] Employee service in `apps/core/services/employee_service.py`
+- [ ] Employee service in `apps/employees/services/employee_service.py`
 - [ ] Auto-generated `emp_number` (NXS-0001 format, unique per company)
 - [ ] `transaction.atomic()` for employee + user + leave balance creation
 
@@ -219,7 +219,7 @@
 - [ ] `AuditLog` model — append-only, before/after JSON snapshots
 - [ ] Auto-hook AuditLog via Django signal or base serializer mixin
 - [ ] `Notification` model — table created for schema stability
-- [ ] Custom exception classes in `apps/core/exceptions.py`
+- [ ] Custom exception classes in `apps/users/exceptions.py`
 - [ ] `apps/shared/exceptions.py` — `NexusBaseError`
 - [ ] Shared pagination class in `apps/shared/utils/pagination.py`
 
@@ -340,7 +340,9 @@ For every phase, write tests in parallel:
 
 | App | Minimum |
 |-----|---------|
-| core | 85% |
+| companies | 85% |
+| users | 85% |
+| audit | 85% |
 | attendance | 80% |
 | hse | 80% |
 | payroll | 85% |

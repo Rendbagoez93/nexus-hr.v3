@@ -25,9 +25,13 @@ module code is written.
   │   └── settings/       ← base.py, local.py, production.py, envcommon.py
   ├── apps/
   │   ├── shared/         ← cross-module utilities
-  │   ├── core/           ← Company, AuthUser, Employee, Department, Position
+  │   ├── companies/      ← Company, SubscriptionPlan, CompanySubscription
+  │   ├── users/          ← AuthUser, RefreshToken
+  │   ├── audit/          ← AuditLog
+  │   ├── departments/    ← Department, Position (stubs)
+  │   ├── documents/     ← EmployeeDocument (stub)
   │   ├── attendance/     ← Attendance, Shift, Leave
-  │   ├── hse/            ← Violation, ManHours, Induction, WorkPermit
+  │   ├── hse/           ← Violation, ManHours, Induction, WorkPermit
   │   └── payroll/        ← PayrollRun, Payslip
   ├── templates/
   ├── static/
@@ -110,29 +114,29 @@ Build modules in dependency order: Core first, then Attendance, then HSE, then P
 
 ### 2.1 — Core Module — Company & Subscription
 
-**Models (`apps/core/models/company.py`)**
+**Models (`apps/companies/models.py`)**
 - [ ] `Company` — name, industry, subscription_tier, is_active, geofence fields, timestamps
 - [ ] `SubscriptionPlan` — name, has_attendance, has_hse, has_payroll flags
 - [ ] `CompanySubscription` — links company to plan, billing_period, active_employee_count
-- [ ] Register all three in `apps/core/admin.py`
+- [ ] Register all three in `apps/companies/admin.py`
 
-**Constants & Choices (`apps/core/`)**
+**Constants & Choices (`apps/companies/`)**
 - [ ] `constants.py` — all business constants: BPJS rates, PTKP values, leave quotas, geofence radius, offline sync window
 - [ ] `choices.py` — all TextChoices classes: industry, subscription_tier, employment_type, employee_status, document types, etc.
 
-**Selectors (`apps/core/selectors/company.py`)**
+**Selectors (`apps/companies/selectors/company.py`)**
 - [ ] `get_company_by_id(company_id)` — returns company or raises NexusNotFound
 - [ ] `list_companies()` — platform admin only
 - [ ] `get_company_subscription(company)` — returns active subscription with plan details
 
 ### 2.2 — Core Module — Auth & AuthUser
 
-**Model (`apps/core/models/user.py`)**
+**Model (`apps/users/models.py`)**
 - [ ] `AuthUser` extending `AbstractBaseUser` — email as login field, role, company FK (nullable for platform admin), timestamps
 - [ ] Role choices: `platform_admin`, `hr_admin`, `manager`, `employee`, `hse_officer`
 - [ ] `RefreshToken` model — token_hash, expires_at, device_id, is_revoked (indexed on user_id + device_id, user_id + is_revoked)
 
-**Services (`apps/core/services/auth.py`)**
+**Services (`apps/users/services/auth.py`)**
 - [ ] `authenticate_user(email, password)` — validates credentials, returns user or None
 - [ ] `create_tokens_for_user(user)` — generates access + refresh tokens
 - [ ] `refresh_access_token(refresh_token)` — validates and returns new access token
@@ -157,47 +161,47 @@ Build modules in dependency order: Core first, then Attendance, then HSE, then P
 
 ### 2.3 — Core Module — Department
 
-**Model (`apps/core/models/department.py`)**
+**Model (`apps/departments/models.py`)**
 - [ ] `Department` — name, code, company FK, parent self-FK, is_active, deleted_at, timestamps
 - [ ] Unique constraint on (company, code)
 - [ ] Index on (company_id, is_active), (company_id, parent_id)
 
-**Selectors (`apps/core/selectors/department.py`)**
+**Selectors (`apps/departments/selectors/department.py`)**
 - [ ] `list_departments(company_id, parent_id=None, is_active=True)` — tenant-scoped list
 - [ ] `get_department_tree(company_id)` — returns nested tree for org-chart display
 - [ ] `get_department_by_id(department_id, company_id)` — raises NexusNotFound if not found or wrong company
 
-**Services (`apps/core/services/department.py`)**
+**Services (`apps/departments/services/department.py`)**
 - [ ] `create_department(company_id, data)` — creates department, validates code uniqueness
 - [ ] `update_department(department_id, company_id, data)` — updates fields
 - [ ] `soft_delete_department(department_id, company_id)` — sets is_active=False
 
-**Serializers (`apps/core/serializers/department.py`)**
+**Serializers (`apps/departments/serializers/department.py`)**
 - [ ] `DepartmentSerializer` — output serializer with nested children
 - [ ] `DepartmentCreateSerializer`, `DepartmentUpdateSerializer` — input validation
 
-**Views (`apps/core/views_api.py`)**
+**Views (`apps/departments/views_api.py`)**
 - [ ] `DepartmentViewSet` — CRUD via DRF ModelViewSet, thin views calling selectors/services
 
-**URLs (`apps/core/urls_api.py`)**
+**URLs (`apps/departments/urls_api.py`)**
 - [ ] Register Department routes: `/api/v1/departments`
 
 ### 2.4 — Core Module — Position
 
-**Model (`apps/core/models/position.py`)**
+**Model (`apps/departments/models.py`)**
 - [ ] `Position` — title, level, department FK, company FK, base_salary_min/max (DecimalField), is_active, deleted_at, timestamps
 - [ ] Check constraint: base_salary_min <= base_salary_max
 
-**Selectors (`apps/core/selectors/position.py`)**
+**Selectors (`apps/departments/selectors/position.py`)**
 - [ ] `list_positions(company_id, department_id=None, level=None, is_active=True)`
 - [ ] `get_position_by_id(position_id, company_id)`
 
-**Services (`apps/core/services/position.py`)**
+**Services (`apps/departments/services/position.py`)**
 - [ ] `create_position(company_id, data)`
 - [ ] `update_position(position_id, company_id, data)`
 - [ ] `soft_delete_position(position_id, company_id)`
 
-**Serializers (`apps/core/serializers/position.py`)**
+**Serializers (`apps/departments/serializers/position.py`)**
 - [ ] `PositionSerializer`, `PositionCreateSerializer`, `PositionUpdateSerializer`
 
 **Views + URLs**
@@ -205,7 +209,7 @@ Build modules in dependency order: Core first, then Attendance, then HSE, then P
 
 ### 2.5 — Core Module — Employee
 
-**Model (`apps/core/models/employee.py`)**
+**Model (`apps/employees/models.py`)**
 - [ ] `Employee` — full personal, employment, and compliance fields as per database-schema.md
 - [ ] O2O link to `AuthUser` (nullable)
 - [ ] Auto-generated `emp_number` (NXS-0001 format, unique per company)
@@ -213,20 +217,20 @@ Build modules in dependency order: Core first, then Attendance, then HSE, then P
 - [ ] Indexes: (company_id, status), (company_id, department_id), (company_id, employment_type)
 - [ ] Unique constraint on (company, emp_number)
 
-**Selectors (`apps/core/selectors/employee.py`)**
+**Selectors (`apps/employees/selectors/employee.py`)**
 - [ ] `list_employees(company_id, filters)` — paginated, filterable by department, status, position, employment_type
 - [ ] `get_employee_by_id(employee_id, company_id)`
 - [ ] `get_employee_by_user_id(user_id)`
 - [ ] `get_employee_by_emp_number(emp_number, company_id)`
 - [ ] `count_active_employees(company_id)` — for subscription billing
 
-**Services (`apps/core/services/employee_service.py`)**
+**Services (`apps/employees/services/employee_service.py`)**
 - [ ] `create_employee(company_id, data, create_user=False)` — `transaction.atomic()` for employee + optional user creation
 - [ ] `update_employee(employee_id, company_id, data)`
 - [ ] `deactivate_employee(employee_id, company_id, status, resign_date)` — changes status + sets resign_date
 - [ ] `generate_emp_number(company_id)` — NXS-0001 format, thread-safe
 
-**Serializers (`apps/core/serializers/employee.py`)**
+**Serializers (`apps/employees/serializers/employee.py`)**
 - [ ] `EmployeeListSerializer`, `EmployeeDetailSerializer`, `EmployeeCreateSerializer`, `EmployeeUpdateSerializer`
 
 **Views + URLs**
@@ -235,16 +239,16 @@ Build modules in dependency order: Core first, then Attendance, then HSE, then P
 
 ### 2.6 — Core Module — Employee Document
 
-**Model (`apps/core/models/document.py`)**
+**Model (`apps/documents/models.py`)**
 - [ ] `EmployeeDocument` — employee FK, doc_type, file_url (S3 key), file_name, valid_until, is_verified, is_active, deleted_at, timestamps
 
-**Services (`apps/core/services/document_service.py`)**
+**Services (`apps/documents/services/document_service.py`)**
 - [ ] `upload_employee_document(employee_id, company_id, doc_type, file, file_name, valid_until)` — stores to S3, creates record
 - [ ] `get_document_signed_url(document_id, company_id)` — generates 15-min signed URL
 - [ ] `update_document_metadata(document_id, company_id, data)`
 - [ ] `soft_delete_document(document_id, company_id)`
 
-**Serializers (`apps/core/serializers/document.py`)**
+**Serializers (`apps/documents/serializers/document.py`)**
 - [ ] `DocumentSerializer`, `DocumentCreateSerializer`
 
 **Views + URLs**
@@ -252,12 +256,12 @@ Build modules in dependency order: Core first, then Attendance, then HSE, then P
 
 ### 2.7 — Core Module — Audit & Notifications
 
-**Audit (`apps/core/models/audit.py`)**
+**Audit (`apps/audit/models.py`)**
 - [ ] `AuditLog` — append-only, stores table_name, record_id, action, before/after JSON, user_id, ip_address, timestamp
 - [ ] Hook into Django's `post_save` and `post_delete` signals for automatic logging
-- [ ] Create signal handler in `apps/core/signals.py`
+- [ ] Create signal handler in `apps/companies/signals.py`
 
-**Notifications (`apps/core/models/notification.py`)**
+**Notifications (`apps/audit/models/notification.py`)**
 - [ ] `Notification` model — user FK, title, message, is_read, created_at (schema reserved for future)
 
 ### 2.8 — Attendance Module

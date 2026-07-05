@@ -680,7 +680,7 @@ Use `factory_boy` for complex test data (this IS the Factory pattern).
 ```python
 # tests/factories.py
 import factory
-from apps.core.models import Employee, Company
+from apps.companies.models import Company  # Employee will be added when apps/employees/ is created
 from apps.payroll.models import Payslip
 
 class CompanyFactory(factory.django.DjangoModelFactory):

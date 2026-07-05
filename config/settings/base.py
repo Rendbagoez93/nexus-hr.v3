@@ -15,9 +15,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent  # nexus-hr.v3/
 
 
 # ── Core ──────────────────────────────────────────────────────────────────────
-SECRET_KEY = env.secret_key
-DEBUG = env.debug
-ALLOWED_HOSTS = [h.strip() for h in env.allowed_hosts.split(",") if h.strip()]
+SECRET_KEY = env.SECRET_KEY
+DEBUG = env.DEBUG
+ALLOWED_HOSTS = env.ALLOWED_HOSTS
 
 # ── Application registry ──────────────────────────────────────────────────────
 DJANGO_APPS = [
@@ -40,7 +40,11 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "apps.shared",
-    "apps.core",
+    "apps.companies",
+    "apps.users",
+    "apps.audit",
+    "apps.departments",
+    "apps.documents",
     "apps.attendance",
     "apps.hse",
     "apps.payroll",
@@ -58,7 +62,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_structlog.middleware.RequestMiddleware",
-    "apps.shared.middleware.tenant_middleware:TenantMiddleware",
+    "apps.shared.middleware.tenant_middleware.TenantMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -83,35 +87,20 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 
 # ── Database ─────────────────────────────────────────────────────────────────
-# PostgreSQL is configured in envcommon.py (postgresql://postgres:postgres@localhost:5433/nexus_hr)
-# The parser below handles both PostgreSQL and SQLite URLs
-def _parse_database_url(url: str) -> dict:
-    """Convert DATABASE_URL (e.g. postgres://user:pass@host:5432/db)
-    into Django DATABASES['default'] dict.
-    Falls back to SQLite for sqlite:// URLs."""
-    if url.startswith("sqlite"):
-        return {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    import urllib.parse
-
-    parsed = urllib.parse.urlparse(url)
-    return {
+DATABASES = {
+    "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": parsed.path.lstrip("/"),
-        "USER": parsed.username or "",
-        "PASSWORD": parsed.password or "",
-        "HOST": parsed.hostname or "",
-        "PORT": str(parsed.port) if parsed.port else "",
+        "NAME": env.DB_NAME,
+        "USER": env.DB_USER,
+        "PASSWORD": env.DB_PASSWORD,
+        "HOST": env.DB_HOST,
+        "PORT": str(env.DB_PORT),
     }
-
-
-DATABASES = {"default": _parse_database_url(env.database_url)}
+}
 
 
 # ── Auth ─────────────────────────────────────────────────────────────────────
-AUTH_USER_MODEL = "core.AuthUser"
+AUTH_USER_MODEL = "users.AuthUser"
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},

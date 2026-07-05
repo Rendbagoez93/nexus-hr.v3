@@ -42,8 +42,8 @@ Four core modules: **Core** (employee master data, auth), **Attendance & Leave**
 ```
 apps/
   shared/         # Cross-module utilities, mixins, logging (see technical-requirement-document.md §6)
-  core/           # Employee, AuthUser, Company, Department, Position, Documents
-    users/        # user app: models, selectors, services, serializers, views, admin
+  companies/    # Company, SubscriptionPlan, CompanySubscription
+  users/        # AuthUser, RefreshToken
   attendance/     # Clock-in/out, Shifts, Leave
   hse/            # Violations, Man-hours, Work Permits, Inductions
   payroll/        # Payslips, Overtime, PPh 21, BPJS
@@ -59,7 +59,7 @@ docs/
 
 Each app follows this internal layout: `choices.py`, `constants.py`, `exceptions.py`, `managers.py`, `models.py`, `schemas.py`, `serializers.py`, `views.py`, `urls.py`, `services.py`, `admin.py`, `tests/`.
 
-Apps are registered under the `apps/` namespace. Import as `apps.core.models`, not `core.models`.
+Apps are registered under the `apps/` namespace. Import as `apps.companies.models`, etc.
 
 **Views are thin** — parse input, call a service, return a response. Business logic belongs in `services/`.
 
@@ -188,7 +188,7 @@ Never inline a magic number or string in `.py` code. Use the correct tier:
 return min(gross, Decimal("12000000")) * Decimal("0.01")
 
 # ✅
-from apps.core.constants import BPJS_KES_SALARY_CAP, BPJS_KES_EMPLOYEE_RATE
+from apps.companies.constants import BPJS_KES_SALARY_CAP, BPJS_KES_EMPLOYEE_RATE
 return min(gross, BPJS_KES_SALARY_CAP) * BPJS_KES_EMPLOYEE_RATE
 ```
 
@@ -392,8 +392,8 @@ from django.db import models, transaction
 import structlog
 
 # 3 — Internal
-from apps.core.managers import TenantManager
-from apps.core.models import Employee
+from apps.shared.models import TenantManager
+# Employee will be in apps/employees/ — not yet created
 ```
 
 No wildcard imports. No unused imports. No import aliasing unless it genuinely prevents a name clash.
@@ -407,7 +407,7 @@ No wildcard imports. No unused imports. No import aliasing unless it genuinely p
 - Do not hard-delete any model referenced by historical records.
 - Do not store raw refresh tokens — always hash before persisting.
 - Do not expose raw S3 URLs to clients.
-- Do not put Attendance, HSE, or Payroll logic in `apps/core`.
+- Do not put Attendance, HSE, or Payroll logic in the foundational apps (`companies`, `users`, `audit`).
 - Do not build features belonging to a later module (see [`docs/implementation-plan.md`](../docs/implementation-plan.md)).
 - Do not use `null=True` on `CharField` — use `blank=True, default=""`.
 - Do not use `datetime.utcnow()` — use `get_current_utc_datetime()`.

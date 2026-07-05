@@ -1,16 +1,9 @@
-"""
-apps/core/signals.py
-
-Signal handlers for the core app (audit logging hooks).
-"""
 
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
-from apps.core.models.audit import AuditLog
-from apps.core.models.company import Company
-
-# Employee signals will be added in Phase 6 when Employee model is implemented
+from apps.audit.models import AuditLog
+from apps.companies.models import Company
 
 
 def _get_user_id():
@@ -65,6 +58,3 @@ def audit_log_delete(sender, instance, **kwargs):
         after_data=None,
         user_id=_get_user_id(),
     )
-
-
-# Note: Employee signal handlers will be added in Phase 6

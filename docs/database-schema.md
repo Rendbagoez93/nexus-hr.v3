@@ -20,9 +20,9 @@
 
 ## 2. Tables
 
-### Platform-Level Tables (No TenantModel)
+### Platform-Level Tables
 
-#### `core_company`
+#### `companies_company`
 
 The tenant boundary. Everything else is a child of Company.
 
@@ -39,7 +39,7 @@ The tenant boundary. Everything else is a child of Company.
 | `created_at` | DateTimeField | auto |
 | `updated_at` | DateTimeField | auto |
 
-#### `core_subscriptionplan`
+#### `companies_subscription_plan`
 
 | Field | Type | Notes |
 |-------|------|-------|
@@ -49,7 +49,7 @@ The tenant boundary. Everything else is a child of Company.
 | `has_hse` | BooleanField | Module flag |
 | `has_payroll` | BooleanField | Module flag |
 
-#### `core_companysubscription`
+#### `companies_company_subscription`
 
 | Field | Type | Notes |
 |-------|------|-------|
@@ -63,7 +63,7 @@ The tenant boundary. Everything else is a child of Company.
 
 ### Authentication Tables
 
-#### `core_authuser`
+#### `users_auth_user`
 
 Custom user model extending `AbstractBaseUser`. Email as login (no username).
 
@@ -79,7 +79,7 @@ Custom user model extending `AbstractBaseUser`. Email as login (no username).
 | `created_at` | DateTimeField | auto |
 | `updated_at` | DateTimeField | auto |
 
-#### `core_refreshtoken`
+#### `users_refresh_token`
 
 | Field | Type | Notes |
 |-------|------|-------|
@@ -96,7 +96,7 @@ Custom user model extending `AbstractBaseUser`. Email as login (no username).
 
 ### Core Module Tables
 
-#### `core_department`
+#### `departments_department`
 
 | Field | Type | Notes |
 |-------|------|-------|
@@ -113,7 +113,7 @@ Custom user model extending `AbstractBaseUser`. Email as login (no username).
 **Indexes**: `(company_id, is_active)`, `(company_id, parent_id)`
 **Constraints**: `UniqueConstraint(company, code)`
 
-#### `core_position`
+#### `departments_position`
 
 | Field | Type | Notes |
 |-------|------|-------|
@@ -170,7 +170,7 @@ The central entity. Every other module points here.
 - `UniqueConstraint(company, emp_number)`
 - `CheckConstraint(resign_date IS NULL OR resign_date >= join_date)`
 
-#### `core_employeedocument`
+#### `documents_employee_document`
 
 | Field | Type | Notes |
 |-------|------|-------|
@@ -430,7 +430,7 @@ Read-only — derived from attendance logs by Celery tasks.
 
 ### Audit Table (Cross-Tenant)
 
-#### `core_auditlog`
+#### `audit_audit_log`
 
 Append-only. No UPDATE or DELETE.
 
@@ -514,7 +514,7 @@ graph TD
 | Relationship | on_delete | Reason |
 |--------------|-----------|--------|
 | Tenant model → Company | CASCADE | Deleting company removes all data |
-| Record → Employee | PROTECT | Employee must not vanish while referenced |
+| Record → Employee  # Employee in apps/employees/ (future) | PROTECT | Employee must not vanish while referenced |
 | Record → Department | PROTECT | Historical records keep department ref |
 | Record → Position | PROTECT | Payslips reference positions |
 | Employee → AuthUser | SET_NULL | Revoking login should not delete employee |

@@ -100,13 +100,18 @@ nexus-hr.v2/
 ├── config/            # settings, root urls, asgi/wsgi
 ├── apps/
 │   ├── shared/        # cross-module utilities, mixins, permissions, logging, utils
-│   ├── core/          # Employee, Department, Position, Document, User, Company
+│   ├── companies/     # Company, SubscriptionPlan, CompanySubscription
+│   ├── users/         # AuthUser, RefreshToken
+│   ├── audit/         # AuditLog
+│   ├── departments/    # Department, Position (stubs)
+│   ├── documents/     # EmployeeDocument (stub)
 │   ├── attendance/    # Attendance, Shift, LeaveRequest, LeaveBalance
 │   ├── hse/           # Violation, ManHourEntry, Induction, WorkPermit, License
 │   ├── payroll/       # PayrollRun, Payslip, Overtime, PPh21Bracket, BPJSRate
 │   └── apis/
 │       └── v1/
-│           ├── core/  # views.py, urls.py
+│           ├── companies/
+│           ├── users/
 │           ├── attendance/
 │           ├── hse/
 │           └── payroll/
@@ -116,10 +121,10 @@ nexus-hr.v2/
 └── docs/              # product, technical, and design documentation
 ```
 
-`core` must never import from `attendance`, `hse`, `payroll`, or `billing`.
-Those four depend on `core` (for `Employee`, `Company`, `User`), never the
-reverse. If you find yourself importing "downward," the model or logic is
-probably misplaced.
+`companies`, `users`, `audit` must never import from `attendance`, `hse`, `payroll`.
+Those three depend on `companies` (for `Company`), `users` (for `AuthUser`), and
+`audit` — never the reverse. If you find yourself importing "downward," the
+model or logic is probably misplaced.
 
 ## Coding standards (non-negotiable for this project)
 
