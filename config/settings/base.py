@@ -61,7 +61,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django_structlog.middleware.RequestMiddleware",
+    "django_structlog.middlewares.request.RequestMiddleware",
     "apps.shared.middleware.tenant_middleware.TenantMiddleware",
 ]
 
@@ -84,6 +84,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
+ASGI_APPLICATION = "config.asgi.application"
 
 
 # ── Database ─────────────────────────────────────────────────────────────────
