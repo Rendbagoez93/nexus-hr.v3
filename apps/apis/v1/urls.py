@@ -6,15 +6,10 @@ Root URL configuration for the v1 API.
 
 from django.urls import include, path
 
-# Core endpoints
-core_patterns = []
-attendance_patterns = []
-hse_patterns = []
-payroll_patterns = []
-auth_patterns = []
+from apps.apis.v1.auth.urls import urlpatterns as auth_patterns
 
 urlpatterns = [
-    # path("auth/", include((auth_patterns, "auth"))),
+    path("auth/", include((auth_patterns, "auth"))),
     # path("companies/", include((core_patterns, "core"))),
     # path("departments/", include((core_patterns, "department"))),
     # path("positions/", include((core_patterns, "position"))),
