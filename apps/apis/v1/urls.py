@@ -7,12 +7,13 @@ Root URL configuration for the v1 API.
 from django.urls import include, path
 
 from apps.apis.v1.auth.urls import urlpatterns as auth_patterns
+from apps.apis.v1.departments.urls import urlpatterns as department_patterns
+from apps.apis.v1.positions.urls import urlpatterns as position_patterns
 
 urlpatterns = [
     path("auth/", include((auth_patterns, "auth"))),
-    # path("companies/", include((core_patterns, "core"))),
-    # path("departments/", include((core_patterns, "department"))),
-    # path("positions/", include((core_patterns, "position"))),
+    path("departments/", include((department_patterns, "department"))),
+    path("positions/", include((position_patterns, "position"))),
     # path("employees/", include((core_patterns, "employee"))),
     # path("attendance-logs/", include((attendance_patterns, "attendance"))),
     # path("shifts/", include((attendance_patterns, "shift"))),
