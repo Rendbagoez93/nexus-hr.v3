@@ -1,5 +1,7 @@
 
 from django.db import models
+from django.core.exceptions import ValidationError as DjangoValidationError
+from pydantic import ValidationError
 
 from apps.companies.choices import INDUSTRY_CHOICES, SUBSCRIPTION_TIER_CHOICES
 from apps.shared.mixins.soft_delete import SoftDeleteMixin
@@ -53,10 +55,10 @@ class SubscriptionPlan(TimestampedModel):
 
 
 class CompanySubscription(TimestampedModel):
-    company = models.OneToOneField(
+    company = models.ForeignKey(
         "companies.Company",
         on_delete=models.CASCADE,
-        related_name="active_subscription",
+        related_name="subscriptions",
     )
     plan = models.ForeignKey(
         "companies.SubscriptionPlan",
@@ -71,6 +73,18 @@ class CompanySubscription(TimestampedModel):
     class Meta:
         db_table = "companies_company_subscription"
         ordering = ["-billing_period_end"]
+        
+    def clean(self):
+        super().clean()
+        if self.billing_period_start and self.billing_period_end:
+            if self.billing_period_end <= self.billing_period_start:
+                raise DjangoValidationError({
+                    "billing_period_end": "Billing period end must be after billing period start."
+                })
 
+    def save(self, *args, **kwargs):
+        self.full_clean()  # Validate before saving
+        super().save(*args, **kwargs)
+    
     def __str__(self) -> str:
         return f"{self.company.name} → {self.plan.name}"

@@ -1,6 +1,8 @@
+from datetime import datetime
 
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
+from django.forms import model_to_dict
 
 from apps.audit.models import AuditLog
 from apps.companies.models import Company
@@ -19,11 +21,22 @@ def _get_user_id():
     return None
 
 
+def _serialize_field_value(value):
+    """Serialize a field value for JSON storage, handling datetime objects."""
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value.isoformat()
+    if hasattr(value, "pk"):  # FK or model instance
+        return value.pk
+    return value
+
+
 def _serialize_instance(instance) -> dict | None:
     """Serialize a Django model instance to a dict for audit logging."""
     try:
         return {
-            field.name: getattr(instance, field.name, None)
+            field.name: _serialize_field_value(getattr(instance, field.name, None))
             for field in instance._meta.fields
         }
     except Exception:  # noqa: BLE001
