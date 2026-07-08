@@ -72,7 +72,7 @@ class PositionViewSet(viewsets.ViewSet):
         """
         from pydantic import ValidationError
 
-        from apps.apis.v1.positions.schemas import PositionCreateRequest
+        from apps.departments.schemas import PositionCreateRequest
 
         company_id = self._company_id(request)
 
@@ -112,7 +112,7 @@ class PositionViewSet(viewsets.ViewSet):
         """
         from pydantic import ValidationError
 
-        from apps.apis.v1.positions.schemas import PositionUpdateRequest
+        from apps.departments.schemas import PositionUpdateRequest
 
         company_id = self._company_id(request)
 
