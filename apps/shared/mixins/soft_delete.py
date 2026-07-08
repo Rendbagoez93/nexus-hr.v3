@@ -43,7 +43,8 @@ class SoftDeleteMixin(models.Model):
 
     def deactivate(self, deleted_by: str | None = None) -> None:
         self.is_active = False
-        self.deleted_at = datetime.now(timezone.utc)
+        if self.deleted_at is None:
+            self.deleted_at = datetime.now(timezone.utc)
         self.save(update_fields=["is_active", "deleted_at"])
 
     def restore(self) -> None:

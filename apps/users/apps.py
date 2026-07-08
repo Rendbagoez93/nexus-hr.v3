@@ -1,8 +1,3 @@
-"""
-apps/users/apps.py
-
-Users app configuration.
-"""
 
 from django.apps import AppConfig
 

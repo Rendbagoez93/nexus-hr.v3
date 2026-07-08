@@ -27,15 +27,12 @@ def generate_secure_token(length: int = 32) -> str:
 
 
 def mask_sensitive_value(value: str, visible_chars: int = 4, mask_char: str = "*") -> str:
-    """
-    Mask a sensitive string, revealing only the last N characters.
-
-    Example:
-        mask_sensitive_value("secret123456", visible_chars=4)  → "********3456"
-    """
-    if not value or len(value) <= visible_chars:
-        return mask_char * len(value) if value else ""
-    return f"{mask_char * (len(value) - visible_chars)}{value[-visible_chars:]}"
+    if not value:
+        return ""
+    if len(value) <= visible_chars:
+        return mask_char * len(value)
+    reveal_start = len(value) - visible_chars
+    return mask_char * reveal_start + value[reveal_start:]
 
 
 def mask_email(email: str) -> str:

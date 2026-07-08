@@ -87,7 +87,12 @@ def HasModuleAccess(module_flag: str):
             company = getattr(request.user, "company", None)
             if not company:
                 return False
-            subscription = getattr(company, "active_subscription", None)
+            subscription = (
+                company.subscriptions.filter(is_active=True)
+                .exclude(billing_period_end__isnull=True)
+                .order_by("-billing_period_start")
+                .first()
+            )
             if not subscription:
                 return False
             return bool(getattr(subscription.plan, module_flag, False))
