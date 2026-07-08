@@ -4,6 +4,7 @@ Base Django settings — consumed by local.py and production.py.
 Import envcommon values first, then layer Django-specific settings on top.
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 from .envcommon import get_env
@@ -32,6 +33,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "django_filters",
     "django_celery_beat",
     "django_celery_results",
@@ -133,8 +135,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
-        # JWT authentication will be added in Phase 3
-        # "apps.apis.v1.authentication.JWTAuthentication",
+        "apps.apis.v1.authentication.JWTAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -158,10 +159,10 @@ REST_FRAMEWORK = {
 # ── Simple JWT ─────────────────────────────────────────────────────────────────
 # JWT settings will be configured in Phase 3
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": env.jwt_access_token_lifetime_minutes * 60,
-    "REFRESH_TOKEN_LIFETIME": env.jwt_refresh_token_lifetime_days * 86400,
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=env.jwt_access_token_lifetime_minutes),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=env.jwt_refresh_token_lifetime_days),
     "ROTATE_REFRESH_TOKENS": True,
-    "BLACKLIST_AFTER_ROTATION": False,
+    "BLACKLIST_AFTER_ROTATION": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
     "USER_ID_FIELD": "id",
