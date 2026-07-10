@@ -45,10 +45,7 @@ class PositionService:
         try:
             return Position.objects.for_company(company_id).get(pk=pk)
         except Position.DoesNotExist:
-            raise PositionError(
-                detail="Position not found.",
-                status_code=404,
-            )
+            raise PositionError(detail="Position not found.", status_code=404)
 
     @staticmethod
     @transaction.atomic
@@ -65,16 +62,12 @@ class PositionService:
         if base_salary_min > base_salary_max:
             raise PositionError(
                 detail="base_salary_min cannot be greater than base_salary_max.",
-                status_code=400,
             )
 
         try:
             department = Department.objects.for_company(company_id).get(pk=department_id)
         except Department.DoesNotExist:
-            raise PositionError(
-                detail="Department not found.",
-                status_code=404,
-            )
+            raise PositionError(detail="Department not found.", status_code=404)
 
         position = Position(
             company_id=company_id,
@@ -101,21 +94,18 @@ class PositionService:
             if min_val is not None and max_val is not None and min_val > max_val:
                 raise PositionError(
                     detail="base_salary_min cannot be greater than base_salary_max.",
-                    status_code=400,
                 )
         elif "base_salary_min" in fields and fields["base_salary_min"] is not None:
             pos = PositionService.get_by_id(pk, company_id)
             if fields["base_salary_min"] > pos.base_salary_max:
                 raise PositionError(
                     detail="base_salary_min cannot be greater than base_salary_max.",
-                    status_code=400,
                 )
         elif "base_salary_max" in fields and fields["base_salary_max"] is not None:
             pos = PositionService.get_by_id(pk, company_id)
             if pos.base_salary_min > fields["base_salary_max"]:
                 raise PositionError(
                     detail="base_salary_min cannot be greater than base_salary_max.",
-                    status_code=400,
                 )
 
         if "department_id" in fields and fields["department_id"]:
@@ -126,10 +116,7 @@ class PositionService:
                 fields["department"] = department
                 del fields["department_id"]
             except Department.DoesNotExist:
-                raise PositionError(
-                    detail="Department not found.",
-                    status_code=404,
-                )
+                raise PositionError(detail="Department not found.", status_code=404)
         elif "department_id" in fields:
             del fields["department_id"]
 
@@ -155,9 +142,6 @@ class PositionService:
         try:
             position = Position.objects.for_company(company_id).get(pk=pk, is_active=False)
         except Position.DoesNotExist:
-            raise PositionError(
-                detail="Position not found or already active.",
-                status_code=404,
-            )
+            raise PositionError(detail="Position not found or already active.", status_code=404)
         position.restore()
         return position

@@ -43,10 +43,7 @@ class DepartmentService:
         try:
             return Department.objects.for_company(company_id).get(pk=pk)
         except Department.DoesNotExist:
-            raise DepartmentError(
-                detail="Department not found.",
-                status_code=404,
-            )
+            raise DepartmentError(detail="Department not found.", status_code=404)
 
     @staticmethod
     @transaction.atomic
@@ -63,10 +60,7 @@ class DepartmentService:
             try:
                 parent = Department.objects.for_company(company_id).get(pk=parent_id)
             except Department.DoesNotExist:
-                raise DepartmentError(
-                    detail="Parent department not found.",
-                    status_code=404,
-                )
+                raise DepartmentError(detail="Parent department not found.", status_code=404)
 
         department = Department(
             company_id=company_id,
@@ -88,7 +82,11 @@ class DepartmentService:
         department = DepartmentService.get_by_id(pk, company_id)
 
         for field_name, value in fields.items():
-            if value is not None and hasattr(department, field_name):
+            if field_name == "code" and value is not None:
+                value = value.upper()
+            if field_name == "parent_id" and value is None:
+                department.parent = None
+            elif value is not None and hasattr(department, field_name):
                 setattr(department, field_name, value)
 
         department.save()
@@ -111,9 +109,6 @@ class DepartmentService:
                 pk=pk, is_active=False
             )
         except Department.DoesNotExist:
-            raise DepartmentError(
-                detail="Department not found or already active.",
-                status_code=404,
-            )
+            raise DepartmentError(detail="Department not found or already active.", status_code=404)
         department.restore()
         return department
