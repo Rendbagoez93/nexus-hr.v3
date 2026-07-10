@@ -62,9 +62,17 @@ class DepartmentViewSet(viewsets.ViewSet):
         parent_id = request.query_params.get("parent_id")
         is_active = request.query_params.get("is_active", "true").lower() == "true"
 
+        try:
+            parent_id_parsed = UUID(parent_id) if parent_id else None
+        except ValueError:
+            return Response(
+                {"detail": "parent_id must be a valid UUID."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         departments = DepartmentService.list_for_company(
             company_id=company_id,
-            parent_id=UUID(parent_id) if parent_id else None,
+            parent_id=parent_id_parsed,
             is_active=is_active,
         )
 

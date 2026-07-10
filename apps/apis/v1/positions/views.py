@@ -54,9 +54,17 @@ class PositionViewSet(viewsets.ViewSet):
         level = request.query_params.get("level")
         is_active = request.query_params.get("is_active", "true").lower() == "true"
 
+        try:
+            department_id = UUID(department_id) if department_id else None
+        except ValueError:
+            return Response(
+                {"detail": "department_id must be a valid UUID."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         positions = PositionService.list_for_company(
             company_id=company_id,
-            department_id=UUID(department_id) if department_id else None,
+            department_id=department_id,
             level=level,
             is_active=is_active,
         )
