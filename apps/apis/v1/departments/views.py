@@ -111,7 +111,7 @@ class DepartmentViewSet(viewsets.ViewSet):
         GET /api/v1/departments/{id}/
         """
         company_id = self._company_id(request)
-        department = DepartmentService.get_by_id(UUID(pk), company_id)
+        department = DepartmentService.get_by_id(pk, company_id)
         serializer = DepartmentSerializer(department)
         return Response(serializer.data)
 
@@ -134,7 +134,7 @@ class DepartmentViewSet(viewsets.ViewSet):
             fields["parent_id"] = None
 
         department = DepartmentService.update(
-            pk=UUID(pk),
+            pk=pk,
             company_id=company_id,
             **fields,
         )
@@ -146,7 +146,7 @@ class DepartmentViewSet(viewsets.ViewSet):
         DELETE /api/v1/departments/{id}/ — soft delete
         """
         company_id = self._company_id(request)
-        DepartmentService.soft_delete(UUID(pk), company_id)
+        DepartmentService.soft_delete(pk, company_id)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=["post"], url_path="restore")
@@ -155,7 +155,7 @@ class DepartmentViewSet(viewsets.ViewSet):
         POST /api/v1/departments/{id}/restore/
         """
         company_id = self._company_id(request)
-        department = DepartmentService.restore(UUID(pk), company_id)
+        department = DepartmentService.restore(pk, company_id)
         serializer = DepartmentSerializer(department)
         return Response(serializer.data)
 

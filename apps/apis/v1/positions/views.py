@@ -110,7 +110,7 @@ class PositionViewSet(viewsets.ViewSet):
         GET /api/v1/positions/{id}/
         """
         company_id = self._company_id(request)
-        position = PositionService.get_by_id(UUID(pk), company_id)
+        position = PositionService.get_by_id(pk, company_id)
         serializer = PositionSerializer(position)
         return Response(serializer.data)
 
@@ -135,7 +135,7 @@ class PositionViewSet(viewsets.ViewSet):
         fields = schema.model_dump(exclude_unset=True)
 
         position = PositionService.update(
-            pk=UUID(pk),
+            pk=pk,
             company_id=company_id,
             **fields,
         )
@@ -147,7 +147,7 @@ class PositionViewSet(viewsets.ViewSet):
         DELETE /api/v1/positions/{id}/ — soft delete
         """
         company_id = self._company_id(request)
-        PositionService.soft_delete(UUID(pk), company_id)
+        PositionService.soft_delete(pk, company_id)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=["post"], url_path="restore")
@@ -156,6 +156,6 @@ class PositionViewSet(viewsets.ViewSet):
         POST /api/v1/positions/{id}/restore/
         """
         company_id = self._company_id(request)
-        position = PositionService.restore(UUID(pk), company_id)
+        position = PositionService.restore(pk, company_id)
         serializer = PositionSerializer(position)
         return Response(serializer.data)

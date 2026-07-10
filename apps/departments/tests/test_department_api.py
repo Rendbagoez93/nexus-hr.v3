@@ -156,7 +156,7 @@ class TestDepartmentAPICreate:
             format="json",
         )
         assert response.status_code in (400, 404)
-        assert "parent" in response.json().get("detail", "").lower()
+        assert "parent" in response.json().get("message", "").lower()
 
     def test_code_uppercase_normalized(
         self, db, hr_admin_client: APIClient

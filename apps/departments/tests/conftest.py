@@ -146,12 +146,12 @@ def position_other_company(db) -> "Position":
 
 
 @pytest.fixture
-def hr_admin_client(db) -> "APIClient":
-    """Authenticated APIClient for an HR Admin user."""
+def hr_admin_client(db, company: "Company") -> "APIClient":
+    """Authenticated APIClient for an HR Admin user within `company`."""
     from rest_framework.test import APIClient
     from tests.factories import HRAdminFactory
 
-    user = HRAdminFactory()
+    user = HRAdminFactory(company=company)
     api_client = APIClient()
     api_client.force_authenticate(user=user)
     # Store on handler so tests can access via client.handler._force_user
@@ -161,11 +161,11 @@ def hr_admin_client(db) -> "APIClient":
 
 @pytest.fixture
 def other_company_client(db) -> "APIClient":
-    """APIClient authenticated as HR Admin in a second company."""
+    """APIClient authenticated as HR Admin in a second, unrelated company."""
     from rest_framework.test import APIClient
     from tests.factories import HRAdminFactory
 
-    user = HRAdminFactory()
+    user = HRAdminFactory()  # Own SubFactory company — deliberately not `company`
     api_client = APIClient()
     api_client.force_authenticate(user=user)
     api_client.handler._force_user = user
@@ -173,12 +173,12 @@ def other_company_client(db) -> "APIClient":
 
 
 @pytest.fixture
-def manager_client(db) -> "APIClient":
-    """Authenticated APIClient for a Manager user."""
+def manager_client(db, company: "Company") -> "APIClient":
+    """Authenticated APIClient for a Manager user within `company`."""
     from rest_framework.test import APIClient
     from tests.factories import ManagerFactory
 
-    user = ManagerFactory()
+    user = ManagerFactory(company=company)
     api_client = APIClient()
     api_client.force_authenticate(user=user)
     api_client.handler._force_user = user
@@ -186,12 +186,12 @@ def manager_client(db) -> "APIClient":
 
 
 @pytest.fixture
-def employee_client(db) -> "APIClient":
-    """Authenticated APIClient for an Employee user."""
+def employee_client(db, company: "Company") -> "APIClient":
+    """Authenticated APIClient for an Employee user within `company`."""
     from rest_framework.test import APIClient
     from tests.factories import EmployeeUserFactory
 
-    user = EmployeeUserFactory()
+    user = EmployeeUserFactory(company=company)
     api_client = APIClient()
     api_client.force_authenticate(user=user)
     api_client.handler._force_user = user
@@ -199,12 +199,12 @@ def employee_client(db) -> "APIClient":
 
 
 @pytest.fixture
-def hse_officer_client(db) -> "APIClient":
-    """Authenticated APIClient for an HSE Officer user."""
+def hse_officer_client(db, company: "Company") -> "APIClient":
+    """Authenticated APIClient for an HSE Officer user within `company`."""
     from rest_framework.test import APIClient
     from tests.factories import HSEOfficerFactory
 
-    user = HSEOfficerFactory()
+    user = HSEOfficerFactory(company=company)
     api_client = APIClient()
     api_client.force_authenticate(user=user)
     api_client.handler._force_user = user

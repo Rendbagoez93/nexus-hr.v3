@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from django.db import transaction
+from django.db import IntegrityError, transaction
 
 from apps.departments.exceptions import DepartmentError
 from apps.departments.models import Department
@@ -39,10 +39,17 @@ class DepartmentService:
 
     @staticmethod
     def get_by_id(pk: UUID, company_id: UUID) -> Department:
-        """Fetch a single department, enforcing company boundary."""
+        """Fetch a single department, enforcing company boundary.
+
+        Returns 403 (never 404) when the department exists but belongs to
+        another company, so cross-tenant requests never confirm or deny
+        that a resource exists.
+        """
         try:
             return Department.objects.for_company(company_id).get(pk=pk)
         except Department.DoesNotExist:
+            if Department.objects.filter(pk=pk).exclude(company_id=company_id).exists():
+                raise DepartmentError(detail="You do not have access to this department.", status_code=403)
             raise DepartmentError(detail="Department not found.", status_code=404)
 
     @staticmethod
@@ -68,7 +75,13 @@ class DepartmentService:
             code=code.upper(),
             parent=parent,
         )
-        department.save()
+        try:
+            department.save()
+        except IntegrityError:
+            raise DepartmentError(
+                detail="A department with this code already exists.",
+                status_code=400,
+            )
         return department
 
     @staticmethod
@@ -109,6 +122,10 @@ class DepartmentService:
                 pk=pk, is_active=False
             )
         except Department.DoesNotExist:
+            if Department.objects.filter(pk=pk).exclude(company_id=company_id).exists():
+                raise DepartmentError(
+                    detail="Department not found or already active.", status_code=403
+                )
             raise DepartmentError(detail="Department not found or already active.", status_code=404)
         department.restore()
         return department

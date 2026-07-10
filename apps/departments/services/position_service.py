@@ -41,10 +41,17 @@ class PositionService:
 
     @staticmethod
     def get_by_id(pk: UUID, company_id: UUID) -> Position:
-        """Fetch a single position, enforcing company boundary."""
+        """Fetch a single position, enforcing company boundary.
+
+        Returns 403 (never 404) when the position exists but belongs to
+        another company, so cross-tenant requests never confirm or deny
+        that a resource exists.
+        """
         try:
             return Position.objects.for_company(company_id).get(pk=pk)
         except Position.DoesNotExist:
+            if Position.objects.filter(pk=pk).exclude(company_id=company_id).exists():
+                raise PositionError(detail="You do not have access to this position.", status_code=403)
             raise PositionError(detail="Position not found.", status_code=404)
 
     @staticmethod
@@ -142,6 +149,10 @@ class PositionService:
         try:
             position = Position.objects.for_company(company_id).get(pk=pk, is_active=False)
         except Position.DoesNotExist:
+            if Position.objects.filter(pk=pk).exclude(company_id=company_id).exists():
+                raise PositionError(
+                    detail="Position not found or already active.", status_code=403
+                )
             raise PositionError(detail="Position not found or already active.", status_code=404)
         position.restore()
         return position

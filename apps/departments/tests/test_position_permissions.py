@@ -93,7 +93,7 @@ class TestPositionPermissions:
     # ---- create ----
 
     def test_create_hr_admin(self, db, hr_admin_client: APIClient):
-        user = hr_admin_client.handler._force_auth_user
+        user = hr_admin_client.handler._force_user
         dept = Department.objects.create(
             company_id=user.company_id,
             name="Create Perm Dept",
