@@ -32,8 +32,7 @@
 | pytest-django | Test runner |
 | factory-boy | Test data factories |
 | django-debug-toolbar | Local development debugging |
-| black | Code formatting |
-| ruff | Linting + import sorting + formatting |
+| ruff | Linting + import sorting + formatting (replaces black + isort) |
 
 ### Frontend
 
@@ -58,7 +57,7 @@
 
 ### Environment Configuration
 
-All secrets and environment-specific values managed via `pydantic-settings` reading from `.env`: SECRET_KEY, DATABASE_URL, REDIS_URL, DEBUG, ALLOWED_HOSTS, AWS_BUCKET_NAME, AWS_REGION, AWS_SIGNED_URL_EXPIRY_SECONDS, ACCESS_TOKEN_LIFETIME_MINUTES, REFRESH_TOKEN_LIFETIME_DAYS, SENTRY_DSN, SENTRY_ENVIRONMENT 
+All secrets and environment-specific values are managed via `pydantic-settings` (`config/settings/envcommon.py`) reading from `.env`: `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, `REDIS_URL`, `JWT_ACCESS_TOKEN_LIFETIME_MINUTES`, `JWT_REFRESH_TOKEN_LIFETIME_DAYS`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `EMAIL_FROM`, `SENTRY_DSN`, `SENTRY_ENVIRONMENT`, `LOG_LEVEL`. There is no single `DATABASE_URL` — the database is configured field-by-field (`DB_*`). AWS/S3 fields (`AWS_S3_ACCESS_KEY_ID`, `AWS_S3_BUCKET_NAME`, etc.) are not yet defined in `envcommon.py` — add them there before wiring up the commented-out S3 `STORAGES` block in `config/settings/base.py`.
 
 ### Settings Architecture
 
@@ -336,103 +335,58 @@ Default page size: 25, Maximum: 100
 3. Implement the DRF view (serializer must match schema)
 4. Validate with drf-spectacular
 
-Schema files: `docs/openapi/` (one per module: `core.yaml`, `attendance.yaml`, `hse.yaml`, `payroll.yaml`)
+Schema files: `docs/openapi/` (one per module: `core.yaml` — bundles auth, companies, departments, positions, documents — plus `attendance.yaml`, `hse.yaml`, `payroll.yaml`). `core.yaml` is a documentation-grouping label only — there is no unified `apps/core/` app in the codebase; see the Project Structure below.
 
 ## 6. Code Architecture
 
 ### Project Structure
 
+There is no unified `apps/core/` app — Company, Auth, Department/Position, and
+Documents each live in their own top-level app, matching what's actually on
+disk today:
+
 ```text
 apps/
   shared/           ← cross-module utilities, mixins, permissions, logging, utils
-  core/             ← Company, AuthUser, Employee, Department, Position, Documents
-    models/         ← company.py, department.py, position.py, employee.py, document.py, audit.py
-    selectors/      ← read queries
-    services/       ← write logic / business rules
-    serializers/    ← internal serializers (not API layer)
-    views_web.py    ← Django views for HTMX dashboard (thin)
-    urls_web.py     ← HTMX dashboard URL routing
-    admin.py
-    choices.py
-    constants.py
-    exceptions.py
-    managers.py
-    tests/
-  attendance/       ← AttendanceLog, Shift, LeaveType, LeaveRequest, LeaveBalance
-    models/
-    selectors/
-    services/
-    serializers/
-    views_web.py
-    urls_web.py
-    admin.py
-    choices.py
-    constants.py
-    exceptions.py
-    managers.py
-    tests/
-  hse/              ← Violation, ManHours, Induction, WorkPermit
-    models/
-    selectors/
-    services/
-    serializers/
-    views_web.py
-    urls_web.py
-    admin.py
-    choices.py
-    constants.py
-    exceptions.py
-    managers.py
-    tests/
-  payroll/           ← PayrollRun, Payslip, PayslipComponent
-    models/
-    selectors/
-    services/
-    serializers/
-    views_web.py
-    urls_web.py
-    admin.py
-    choices.py
-    constants.py
-    exceptions.py
-    managers.py
-    tests/
-  apis/              ← centralized API layer
+  companies/        ← Company, SubscriptionPlan, CompanySubscription
+  users/            ← AuthUser, RefreshToken
+  audit/            ← AuditLog
+  departments/      ← Department, Position
+  documents/        ← EmployeeDocument
+  attendance/       ← AttendanceLog, Shift, LeaveType, LeaveRequest, LeaveBalance (models/ stub — not yet implemented)
+  hse/              ← Violation, ManHours, Induction, WorkPermit (models/ stub — not yet implemented)
+  payroll/          ← PayrollRun, Payslip (models/ stub — not yet implemented)
+  apis/             ← centralized, versioned API layer — separate from the Django apps above
     v1/
       __init__.py
-      core/
-        views.py     ← DRF viewsets/views
-        urls.py      ← API URL routing
-      attendance/
+      apps.py
+      authentication.py   ← shared JWTAuthentication class
+      urls.py             ← root API URL configuration (includes all sub-routers)
+      auth/
         views.py
         urls.py
-      hse/
+      departments/
+        serializers.py
+        services.py
         views.py
         urls.py
-      payroll/
+      positions/
+        serializers.py
+        services.py
         views.py
         urls.py
-      schemas/        ← OpenAPI schemas per module
-        core.yaml
-        attendance.yaml
-        hse.yaml
-        payroll.yaml
-      serializers/   ← API request/response serializers
-        core.py
-        attendance.py
-        hse.py
-        payroll.py
-      routers.py     ← DRF DefaultRouter registering all ViewSets
-      urls.py        ← root API URL configuration (includes all sub-routers)
+      # attendance/, hse/, payroll/ sub-packages are added as those modules are built
 config/
-  settings/         ← base.py, local.py, production.py
+  settings/         ← base.py, local.py, production.py, envcommon.py, logging.py
   urls.py
   wsgi.py / asgi.py
 ```
 
 ### Per Module Structure (apps/{module}/)
 
-Each functional module under `apps/` follows this internal structure:
+Each functional module under `apps/` follows this internal structure. Not every
+file exists for every module yet — `attendance`, `hse`, and `payroll` are still
+stubs; see `implementation-plan.md` for build order:
 
 ```text
 apps/{module}/
@@ -442,15 +396,21 @@ apps/{module}/
   choices.py        ← TextChoices classes
   constants.py      ← business-rule constants
   exceptions.py     ← custom exception classes
-  managers.py       ← TenantManager / custom QuerySets
-  models.py         ← or models/ directory for larger modules
+  models.py         ← or models/ directory for modules not yet built out
+  schemas.py        ← Pydantic input schemas
   selectors.py      ← read queries
-  services.py       ← write logic / business rules
   serializers.py    ← internal serializers (not API layer)
-  views_web.py      ← Django views for HTMX dashboard (thin)
-  urls_web.py       ← HTMX dashboard URL routing
+  services.py       ← write logic / business rules — or a services/ package
+                       for larger modules (e.g. apps/departments/services/department_service.py)
+  signals.py        ← Django signals (used sparingly — see the design-patterns skill)
   tests/            ← test_models, test_services, test_permissions
 ```
+
+There is no per-module `managers.py` — `TenantModel` and `TenantManager` are
+defined once in `apps/shared/models.py` and inherited by every tenant-scoped
+model. There is also no `views_web.py` / `urls_web.py` yet in any module — the
+HTMX dashboard views are planned but not yet built (see `implementation-plan.md`).
+When they are added, they will live in the module itself (e.g. `apps/departments/views_web.py`), not under `apps/apis/`.
 
 ### Per API Module Structure (apps/apis/v1/{module}/)
 
@@ -506,7 +466,7 @@ Each API module calls selectors and services from its corresponding Django app. 
 
 | App | Minimum |
 |-----|----------|
-| core | 85% |
+| companies, users, audit, departments, documents | 85% |
 | attendance | 80% |
 | hse | 80% |
 | payroll | 85% |

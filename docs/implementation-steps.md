@@ -17,10 +17,10 @@ module code is written.
 
 ### 1.1 — Project Scaffold
 
-- [ ] Create Django project `nexus_hr` at the repo root
-- [ ] Create top-level directory structure:
+- [x] Create Django project `nexus_hr` at the repo root
+- [x] Create top-level directory structure:
   ```
-  nexus-hr.v2/
+  nexus-hr.v3/
   ├── config/
   │   └── settings/       ← base.py, local.py, production.py, envcommon.py
   ├── apps/
@@ -38,17 +38,17 @@ module code is written.
   ├── tests/
   └── docs/
   ```
-- [ ] Add `apps/` to `sys.path` or configure as a Django app directory
+- [x] Add `apps/` to `sys.path` or configure as a Django app directory
 
 ### 1.2 — Settings Architecture
 
-- [ ] Create `config/settings/base.py` — shared settings (installed apps, DB, cache, logging)
-- [ ] Create `config/settings/local.py` — `DEBUG=True`, console email backend, file-based media
-- [ ] Create `config/settings/production.py` — `DEBUG=False`, SMTP, S3 storage, Sentry
-- [ ] Create `config/settings/envcommon.py` — environment-common settings consumed by pydantic-settings
-- [ ] Create root `config/settings.py` (or `config/__init__.py`) that imports from the correct environment
-- [ ] Install and configure `pydantic-settings` — all secrets from `.env` (SECRET_KEY, DATABASE_URL, REDIS_URL, AWS_BUCKET_NAME, etc.)
-- [ ] Configure PostgreSQL connection in base.py
+- [x] Create `config/settings/base.py` — shared settings (installed apps, DB, cache, logging)
+- [x] Create `config/settings/local.py` — `DEBUG=True`, console email backend, file-based media
+- [ ] Create `config/settings/production.py` — `DEBUG=False`, SMTP, S3 storage, Sentry (S3 storage not yet wired — see `config/settings/base.py`'s commented-out `STORAGES` block)
+- [x] Create `config/settings/envcommon.py` — environment-common settings consumed by pydantic-settings
+- [x] Create root `config/settings.py` (or `config/__init__.py`) that imports from the correct environment
+- [x] Install and configure `pydantic-settings` — all secrets from `.env` (`SECRET_KEY`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, `REDIS_URL`, etc. — see `config/settings/envcommon.py`; there is no single `DATABASE_URL`)
+- [x] Configure PostgreSQL connection in base.py
 - [ ] Configure Redis / Celery in base.py
 
 ### 1.3 — Shared Utilities (`apps/shared/`)
@@ -56,52 +56,52 @@ module code is written.
 Create these before any module, since every module depends on them.
 
 **Utils (`apps/shared/utils/`)**
-- [ ] `dates.py` — `get_current_utc_datetime()`, `get_current_date()`, `days_until()`, `is_date_expired()`
-- [ ] `ids.py` — `generate_uuid()`, `generate_emp_number()`
-- [ ] `security.py` — `hash_token()`, `generate_secure_token()`, `mask_sensitive_value()`
-- [ ] `pagination.py` — shared `NexusPaginator` class (default 25, max 100)
+- [x] `dates.py` — `get_current_utc_datetime()`, `get_current_date()`, `days_until()`, `is_date_expired()`
+- [x] `ids.py` — `generate_uuid()`, `generate_emp_number()`
+- [x] `security.py` — `hash_token()`, `generate_secure_token()`, `mask_sensitive_value()`
+- [x] `pagination.py` — shared `NexusPaginator` class (default 25, max 100)
 
 **Mixins (`apps/shared/mixins/`)**
-- [ ] `soft_delete.py` — `SoftDeleteMixin`: `is_active` flag + `deleted_at` + `deactivate()` method
-- [ ] `timestamped.py` — `TimestampedModel`: `created_at` + `updated_at` auto fields
+- [x] `soft_delete.py` — `SoftDeleteMixin`: `is_active` flag + `deleted_at` + `deactivate()` method
+- [x] `timestamped.py` — `TimestampedModel`: `created_at` + `updated_at` auto fields
 
 **Logging (`apps/shared/logging/`)**
-- [ ] `logger.py` — `get_logger()`, `log_function_call()` decorator
-- [ ] `context.py` — `bind_request_context()`, `bind_task_context()`
-- [ ] Configure `structlog` + `django-structlog` in settings
+- [x] `logger.py` — `get_logger()`, `log_function_call()` decorator
+- [x] `context.py` — `bind_request_context()`, `bind_task_context()`
+- [x] Configure `structlog` + `django-structlog` in settings
 
 **Permissions (`apps/shared/permissions.py`)**
-- [ ] `IsPlatformAdmin` — `is_superuser=True` only
-- [ ] `IsHRAdmin` — role `hr_admin` within same company
-- [ ] `IsManagerOrAbove` — role `manager` or `hr_admin`
-- [ ] `IsOwnerOrHRAdmin` — employee accessing own record, or HR Admin
-- [ ] `IsHSEOfficerOrAbove` — HSE officer or higher roles
-- [ ] `IsEmployee` — any authenticated employee
-- [ ] `HasModuleAccess(module_flag)` — subscription-tier gating factory
+- [x] `IsPlatformAdmin` — `is_superuser=True` only
+- [x] `IsHRAdmin` — role `hr_admin` within same company
+- [x] `IsManagerOrAbove` — role `manager` or `hr_admin`
+- [x] `IsOwnerOrHRAdmin` — employee accessing own record, or HR Admin
+- [x] `IsHSEOfficerOrAbove` — HSE officer or higher roles
+- [x] `IsEmployee` — any authenticated employee
+- [x] `HasModuleAccess(module_flag)` — subscription-tier gating factory
 
 **Exceptions (`apps/shared/exceptions.py`)**
-- [ ] `NexusBaseError` — base exception
-- [ ] `NexusNotFound`, `NexusForbidden`, `NexusValidationError`, `NexusConflict`
+- [x] `NexusBaseError` — base exception
+- [x] `NexusNotFound`, `NexusForbidden`, `NexusValidationError`, `NexusConflict`
 
 ### 1.4 — Tenant Infrastructure
 
-- [ ] Create `TenantModel` abstract base model with `company = ForeignKey(Company)` and `TenantManager`
-- [ ] Create `TenantManager` with `.for_company(company_id)` method — all tenant-scoped queries must use this
-- [ ] Create `TenantMiddleware` — extracts `company_id` from JWT payload, attaches to `request.company_id`
-- [ ] Add `company_id` to JWT token payload (see Auth setup in §2.3)
-- [ ] Write a test proving tenant-scoped querying works (two companies, verify isolation)
+- [x] Create `TenantModel` abstract base model with `company = ForeignKey(Company)` and `TenantManager`
+- [x] Create `TenantManager` with `.for_company(company_id)` method — all tenant-scoped queries must use this
+- [x] Create `TenantMiddleware` — extracts `company_id` from JWT payload, attaches to `request.company_id`
+- [x] Add `company_id` to JWT token payload (see Auth setup in §2.3)
+- [x] Write a test proving tenant-scoped querying works (two companies, verify isolation)
 
 ### 1.5 — S3 Storage Configuration
 
 - [ ] Install and configure `django-storages` with S3 backend
 - [ ] Set `AWS_S3_ENDPOINT_URL` for MinIO (local dev) and AWS S3 (production)
 - [ ] Configure private ACL and signed URL generation (15-minute expiry)
-- [ ] Create storage helper in `apps/shared/utils/storage.py` — `upload_file()`, `generate_signed_url()`, `delete_file()`
+- [x] Create storage helper in `apps/shared/utils/storage.py` — `upload_file()`, `generate_signed_url()`, `delete_file()`
 
 ### 1.6 — Celery + Background Tasks Setup
 
 - [ ] Configure Celery with Redis broker in `config/celery.py`
-- [ ] Create `apps/shared/tasks.py` — base Celery task class with structured logging
+- [x] Create `apps/shared/tasks.py` — base Celery task class with structured logging
 - [ ] Register Celery app in Django settings
 - [ ] Configure `django-celery-beat` for periodic tasks
 - [ ] Configure `django-celery-results` for task result storage
@@ -115,46 +115,46 @@ Build modules in dependency order: Core first, then Attendance, then HSE, then P
 ### 2.1 — Core Module — Company & Subscription
 
 **Models (`apps/companies/models.py`)**
-- [ ] `Company` — name, industry, subscription_tier, is_active, geofence fields, timestamps
-- [ ] `SubscriptionPlan` — name, has_attendance, has_hse, has_payroll flags
-- [ ] `CompanySubscription` — links company to plan, billing_period, active_employee_count
-- [ ] Register all three in `apps/companies/admin.py`
+- [x] `Company` — name, industry, subscription_tier, is_active, geofence fields, timestamps
+- [x] `SubscriptionPlan` — name, has_attendance, has_hse, has_payroll flags
+- [x] `CompanySubscription` — links company to plan, billing_period, active_employee_count
+- [x] Register all three in `apps/companies/admin.py`
 
 **Constants & Choices (`apps/companies/`)**
-- [ ] `constants.py` — all business constants: BPJS rates, PTKP values, leave quotas, geofence radius, offline sync window
-- [ ] `choices.py` — all TextChoices classes: industry, subscription_tier, employment_type, employee_status, document types, etc.
+- [x] `constants.py` — all business constants: BPJS rates, PTKP values, leave quotas, geofence radius, offline sync window
+- [x] `choices.py` — all TextChoices classes: industry, subscription_tier, employment_type, employee_status, document types, etc.
 
-**Selectors (`apps/companies/selectors/company.py`)**
-- [ ] `get_company_by_id(company_id)` — returns company or raises NexusNotFound
-- [ ] `list_companies()` — platform admin only
-- [ ] `get_company_subscription(company)` — returns active subscription with plan details
+**Selectors (`apps/companies/selectors.py`)**
+- [x] `get_company_by_id(company_id)` — returns company or raises NexusNotFound
+- [x] `list_companies()` — platform admin only
+- [x] `get_company_subscription(company)` — returns active subscription with plan details
 
 ### 2.2 — Core Module — Auth & AuthUser
 
 **Model (`apps/users/models.py`)**
-- [ ] `AuthUser` extending `AbstractBaseUser` — email as login field, role, company FK (nullable for platform admin), timestamps
-- [ ] Role choices: `platform_admin`, `hr_admin`, `manager`, `employee`, `hse_officer`
-- [ ] `RefreshToken` model — token_hash, expires_at, device_id, is_revoked (indexed on user_id + device_id, user_id + is_revoked)
+- [x] `AuthUser` extending `AbstractBaseUser` — email as login field, role, company FK (nullable for platform admin), timestamps
+- [x] Role choices: `platform_admin`, `hr_admin`, `manager`, `employee`, `hse_officer`
+- [x] `RefreshToken` model — token_hash, expires_at, device_id, is_revoked (indexed on user_id + device_id, user_id + is_revoked)
 
 **Services (`apps/users/services/auth.py`)**
-- [ ] `authenticate_user(email, password)` — validates credentials, returns user or None
-- [ ] `create_tokens_for_user(user)` — generates access + refresh tokens
-- [ ] `refresh_access_token(refresh_token)` — validates and returns new access token
-- [ ] `revoke_refresh_token(token_hash)` — marks token as revoked
-- [ ] `revoke_all_user_tokens(user)` — revoke all refresh tokens for user (used on password reset)
-- [ ] `change_password(user, old_password, new_password)` — validates old, sets new
+- [x] `authenticate_user(email, password)` — validates credentials, returns user or None (implemented as `AuthService.authenticate()`)
+- [ ] `create_tokens_for_user(user)` — generates access + refresh tokens (currently done inline in `LoginView` via SimpleJWT, not as a dedicated service function)
+- [ ] `refresh_access_token(refresh_token)` — validates and returns new access token (currently done inline in `TokenRefreshView` via SimpleJWT, not as a dedicated service function)
+- [x] `revoke_refresh_token(token_hash)` — marks token as revoked
+- [x] `revoke_all_user_tokens(user)` — revoke all refresh tokens for user (used on password reset)
+- [x] `change_password(user, old_password, new_password)` — validates old, sets new
 - [ ] `send_password_reset_email(email)` — sends reset email (always returns success to avoid email enumeration)
 
 **JWT Configuration**
-- [ ] Configure `djangorestframework-simplejwt` — access token 60 min, refresh token 30 days
-- [ ] Add `user_id`, `company_id`, `role` to JWT payload
-- [ ] Update `TenantMiddleware` to read `company_id` from JWT
+- [x] Configure `djangorestframework-simplejwt` — access token 60 min, refresh token 30 days
+- [x] Add `user_id`, `company_id`, `role` to JWT payload
+- [x] Update `TenantMiddleware` to read `company_id` from JWT
 
 **API Endpoints**
-- [ ] `POST /api/v1/auth/login` — exchange email + password for tokens
-- [ ] `POST /api/v1/auth/token/refresh` — refresh access token
-- [ ] `POST /api/v1/auth/logout` — revoke refresh token
-- [ ] `POST /api/v1/auth/password/change` — change own password
+- [x] `POST /api/v1/auth/login` — exchange email + password for tokens
+- [x] `POST /api/v1/auth/token/refresh` — refresh access token
+- [x] `POST /api/v1/auth/logout` — revoke refresh token
+- [x] `POST /api/v1/auth/password/change` — change own password
 - [ ] `POST /api/v1/auth/password/reset` — request password reset email
 
 **Done when**: HR Admin can log in and receive JWT containing user_id, company_id, role. Cross-company token test passes.
@@ -162,52 +162,56 @@ Build modules in dependency order: Core first, then Attendance, then HSE, then P
 ### 2.3 — Core Module — Department
 
 **Model (`apps/departments/models.py`)**
-- [ ] `Department` — name, code, company FK, parent self-FK, is_active, deleted_at, timestamps
-- [ ] Unique constraint on (company, code)
-- [ ] Index on (company_id, is_active), (company_id, parent_id)
+- [x] `Department` — name, code, company FK, parent self-FK, is_active, deleted_at, timestamps
+- [x] Unique constraint on (company, code)
+- [x] Index on (company_id, is_active), (company_id, parent_id)
 
-**Selectors (`apps/departments/selectors/department.py`)**
-- [ ] `list_departments(company_id, parent_id=None, is_active=True)` — tenant-scoped list
-- [ ] `get_department_tree(company_id)` — returns nested tree for org-chart display
-- [ ] `get_department_by_id(department_id, company_id)` — raises NexusNotFound if not found or wrong company
+**Selectors (`apps/departments/selectors.py`)**
+- [x] `list_departments(company_id, parent_id=None, is_active=True)` — tenant-scoped list
+- [x] `get_department_tree(company_id)` — returns nested tree for org-chart display
+- [x] `get_department_by_id(department_id, company_id)` — raises NexusNotFound if not found or wrong company
 
-**Services (`apps/departments/services/department.py`)**
-- [ ] `create_department(company_id, data)` — creates department, validates code uniqueness
-- [ ] `update_department(department_id, company_id, data)` — updates fields
-- [ ] `soft_delete_department(department_id, company_id)` — sets is_active=False
+**Services (`apps/departments/services/department_service.py`)**
+- [x] `create_department(company_id, data)` — creates department, validates code uniqueness
+- [x] `update_department(department_id, company_id, data)` — updates fields
+- [x] `soft_delete_department(department_id, company_id)` — sets is_active=False
 
-**Serializers (`apps/departments/serializers/department.py`)**
-- [ ] `DepartmentSerializer` — output serializer with nested children
-- [ ] `DepartmentCreateSerializer`, `DepartmentUpdateSerializer` — input validation
+**Serializers (`apps/departments/serializers.py`)**
+- [x] `DepartmentSerializer` — output serializer with nested children
+- [x] `DepartmentCreateSerializer`, `DepartmentUpdateSerializer` — input validation
 
-**Views (`apps/departments/views_api.py`)**
-- [ ] `DepartmentViewSet` — CRUD via DRF ModelViewSet, thin views calling selectors/services
+**Views (`apps/apis/v1/departments/views.py`)**
+- [x] `DepartmentViewSet` — CRUD via DRF ModelViewSet, thin views calling selectors/services
 
-**URLs (`apps/departments/urls_api.py`)**
-- [ ] Register Department routes: `/api/v1/departments`
+**URLs (`apps/apis/v1/departments/urls.py`)**
+- [x] Register Department routes: `/api/v1/departments`
 
 ### 2.4 — Core Module — Position
 
 **Model (`apps/departments/models.py`)**
-- [ ] `Position` — title, level, department FK, company FK, base_salary_min/max (DecimalField), is_active, deleted_at, timestamps
-- [ ] Check constraint: base_salary_min <= base_salary_max
+- [x] `Position` — title, level, department FK, company FK, base_salary_min/max (DecimalField), is_active, deleted_at, timestamps
+- [x] Check constraint: base_salary_min <= base_salary_max
 
-**Selectors (`apps/departments/selectors/position.py`)**
-- [ ] `list_positions(company_id, department_id=None, level=None, is_active=True)`
-- [ ] `get_position_by_id(position_id, company_id)`
+**Selectors (`apps/departments/selectors.py`)**
+- [x] `list_positions(company_id, department_id=None, level=None, is_active=True)`
+- [x] `get_position_by_id(position_id, company_id)`
 
-**Services (`apps/departments/services/position.py`)**
-- [ ] `create_position(company_id, data)`
-- [ ] `update_position(position_id, company_id, data)`
-- [ ] `soft_delete_position(position_id, company_id)`
+**Services (`apps/departments/services/position_service.py`)**
+- [x] `create_position(company_id, data)`
+- [x] `update_position(position_id, company_id, data)`
+- [x] `soft_delete_position(position_id, company_id)`
 
-**Serializers (`apps/departments/serializers/position.py`)**
-- [ ] `PositionSerializer`, `PositionCreateSerializer`, `PositionUpdateSerializer`
+**Serializers (`apps/departments/serializers.py`)**
+- [x] `PositionSerializer`, `PositionCreateSerializer`, `PositionUpdateSerializer`
 
-**Views + URLs**
-- [ ] `PositionViewSet` — CRUD, registered at `/api/v1/positions`
+**Views + URLs (`apps/apis/v1/positions/views.py`, `urls.py`)**
+- [x] `PositionViewSet` — CRUD, registered at `/api/v1/positions`
 
 ### 2.5 — Core Module — Employee
+
+> ⚠️ `apps/employees/` does not exist yet — it must be created following the
+> same convention as `apps/departments/` (see `database-schema.md`, which
+> already marks this as `apps/employees/ (future)`).
 
 **Model (`apps/employees/models.py`)**
 - [ ] `Employee` — full personal, employment, and compliance fields as per database-schema.md
@@ -217,7 +221,7 @@ Build modules in dependency order: Core first, then Attendance, then HSE, then P
 - [ ] Indexes: (company_id, status), (company_id, department_id), (company_id, employment_type)
 - [ ] Unique constraint on (company, emp_number)
 
-**Selectors (`apps/employees/selectors/employee.py`)**
+**Selectors (`apps/employees/selectors.py`)**
 - [ ] `list_employees(company_id, filters)` — paginated, filterable by department, status, position, employment_type
 - [ ] `get_employee_by_id(employee_id, company_id)`
 - [ ] `get_employee_by_user_id(user_id)`
@@ -230,10 +234,10 @@ Build modules in dependency order: Core first, then Attendance, then HSE, then P
 - [ ] `deactivate_employee(employee_id, company_id, status, resign_date)` — changes status + sets resign_date
 - [ ] `generate_emp_number(company_id)` — NXS-0001 format, thread-safe
 
-**Serializers (`apps/employees/serializers/employee.py`)**
+**Serializers (`apps/employees/serializers.py`)**
 - [ ] `EmployeeListSerializer`, `EmployeeDetailSerializer`, `EmployeeCreateSerializer`, `EmployeeUpdateSerializer`
 
-**Views + URLs**
+**Views + URLs (`apps/apis/v1/employees/views.py`, `urls.py`)**
 - [ ] `EmployeeViewSet` — CRUD + `/me` action + `/deactivate` action
 - [ ] Registered at `/api/v1/employees`
 
@@ -248,20 +252,20 @@ Build modules in dependency order: Core first, then Attendance, then HSE, then P
 - [ ] `update_document_metadata(document_id, company_id, data)`
 - [ ] `soft_delete_document(document_id, company_id)`
 
-**Serializers (`apps/documents/serializers/document.py`)**
+**Serializers (`apps/documents/serializers.py`)**
 - [ ] `DocumentSerializer`, `DocumentCreateSerializer`
 
-**Views + URLs**
+**Views + URLs (`apps/apis/v1/documents/views.py`, `urls.py`, or nested actions on `apps/apis/v1/employees/`)**
 - [ ] Document endpoints nested under employee: `/api/v1/employees/{id}/documents/`
 
 ### 2.7 — Core Module — Audit & Notifications
 
 **Audit (`apps/audit/models.py`)**
-- [ ] `AuditLog` — append-only, stores table_name, record_id, action, before/after JSON, user_id, ip_address, timestamp
-- [ ] Hook into Django's `post_save` and `post_delete` signals for automatic logging
-- [ ] Create signal handler in `apps/companies/signals.py`
+- [x] `AuditLog` — append-only, stores table_name, record_id, action, before/after JSON, user_id, ip_address, timestamp
+- [ ] Hook into Django's `post_save` and `post_delete` signals for automatic logging (only `post_save` is wired so far, and only for `Company` — not yet extended to other tracked models or `post_delete`)
+- [x] Create signal handler in `apps/companies/signals.py`
 
-**Notifications (`apps/audit/models/notification.py`)**
+**Notifications (`apps/audit/models.py`)**
 - [ ] `Notification` model — user FK, title, message, is_read, created_at (schema reserved for future)
 
 ### 2.8 — Attendance Module
@@ -297,7 +301,7 @@ Build modules in dependency order: Core first, then Attendance, then HSE, then P
 - [ ] `compute_daily_attendance_status` — runs end of day, derives present/absent/late/half_day status
 - [ ] `sync_offline_attendance` — processes offline clock-in records within 72h window
 
-**Views + URLs**
+**Views + URLs (`apps/apis/v1/attendance/views.py`, `urls.py`)**
 - [ ] `AttendanceLogViewSet` — CRUD + `/clock-in`, `/clock-out`, `/correct` actions at `/api/v1/attendance-logs`
 - [ ] `ShiftViewSet` at `/api/v1/shifts`
 - [ ] `LeaveTypeViewSet` at `/api/v1/leave-types`
@@ -336,7 +340,7 @@ Build modules in dependency order: Core first, then Attendance, then HSE, then P
 - [ ] `close_work_permit(permit_id, company_id)` — active → closed
 - [ ] `list_work_permits(company_id, filters)`
 
-**Views + URLs**
+**Views + URLs (`apps/apis/v1/hse/views.py`, `urls.py`)**
 - [ ] `ViolationViewSet` at `/api/v1/violations`
 - [ ] `ManHoursViewSet` at `/api/v1/man-hours` — read-only
 - [ ] `InductionViewSet` at `/api/v1/inductions`
@@ -377,7 +381,7 @@ Build modules in dependency order: Core first, then Attendance, then HSE, then P
 - [ ] `get_payroll_run(run_id, company_id)`, `list_payroll_runs(company_id, filters)`
 - [ ] `get_payslip(payslip_id, company_id)`, `list_payslips(company_id, filters)`
 
-**Views + URLs**
+**Views + URLs (`apps/apis/v1/payroll/views.py`, `urls.py`)**
 - [ ] `PayrollRunViewSet` at `/api/v1/payroll-runs` — with `/finalize`, `/cancel` actions
 - [ ] `PayslipViewSet` at `/api/v1/payslips` — with `/download`, `/disburse` actions
 
@@ -389,20 +393,20 @@ Implement after all modules are complete. This section covers cross-cutting API 
 
 ### 3.1 — OpenAPI Schema Setup
 
-- [ ] Install and configure `drf-spectacular` in settings
+- [x] Install and configure `drf-spectacular` in settings
 - [ ] Create `docs/openapi/` directory
 - [ ] Draft `docs/openapi/core.yaml` — all Core module endpoints
 - [ ] Draft `docs/openapi/attendance.yaml` — all Attendance module endpoints
 - [ ] Draft `docs/openapi/hse.yaml` — all HSE module endpoints
 - [ ] Draft `docs/openapi/payroll.yaml` — all Payroll module endpoints
-- [ ] Register schemas in DRF settings: `DEFAULT_SCHEMA_CLASS = 'drf_spectacular.utils.views.AutoSchema'`
+- [x] Register schemas in DRF settings: `DEFAULT_SCHEMA_CLASS = 'drf_spectacular.utils.views.AutoSchema'`
 - [ ] Validate all serializers against schemas using `drf-spectacular`
 
 ### 3.2 — API Router Configuration
 
-- [ ] Create `apps/apis/v1/urls.py` — root URL configuration
-- [ ] Create `apps/apis/v1/routers.py` — DRF DefaultRouter registering all ViewSets
-- [ ] Mount router at `/api/v1/`
+- [x] Create `apps/apis/v1/urls.py` — root URL configuration
+- [ ] Create `apps/apis/v1/routers.py` — DRF DefaultRouter registering all ViewSets (urls.py currently wires each module's `urlpatterns` directly, not via a shared `DefaultRouter`)
+- [x] Mount router at `/api/v1/`
 - [ ] Configure root `/api/v1/` to return API metadata (version, description)
 
 ### 3.3 — Standardized Response Envelope
@@ -412,7 +416,7 @@ Implement after all modules are complete. This section covers cross-cutting API 
   - Single resource: `{ "data": { ... } }`
   - Action confirmation: `{ "message": "..." }`
   - Error: `{ "error": "...", "message": "...", "status": N, "details": {...} }`
-- [ ] Override DRF `ExceptionHandler` to use standardized error shape
+- [x] Override DRF `ExceptionHandler` to use standardized error shape
 
 ### 3.4 — Idempotency
 
@@ -424,28 +428,28 @@ Implement after all modules are complete. This section covers cross-cutting API 
 ### 3.5 — Rate Limiting
 
 - [ ] Configure DRF throttling classes:
-  - `AnonThrottle` — 10 req/min per IP for auth endpoints
+  - `AnonThrottle` — 10 req/min per IP for auth endpoints (only `LoginRateThrottle` for `/auth/login` is implemented so far)
   - `UserReadThrottle` — 300 req/min per token for reads
   - `UserWriteThrottle` — 60 req/min per token for writes
   - `UserUploadThrottle` — 20 req/min per token for uploads
-- [ ] Apply `throttle_classes` at the viewset level, not globally
+- [x] Apply `throttle_classes` at the viewset level, not globally
 
 ### 3.6 — API Tests
 
 For each module, write the following tests:
 
-- [ ] `test_auth_login_success` — valid credentials return tokens
-- [ ] `test_auth_login_failure` — invalid credentials return 401
-- [ ] `test_auth_logout_revokes_token` — revoked token cannot refresh
-- [ ] `test_tenant_isolation` — company A cannot access company B resources (returns 403, not 404)
-- [ ] `test_permission_hr_admin` — hr_admin can CRUD their company's resources
-- [ ] `test_permission_manager` — manager can read but not write beyond scope
-- [ ] `test_permission_employee` — employee can only access own record and clock-in/out
+- [x] `test_auth_login_success` — valid credentials return tokens
+- [x] `test_auth_login_failure` — invalid credentials return 401
+- [x] `test_auth_logout_revokes_token` — revoked token cannot refresh
+- [x] `test_tenant_isolation` — company A cannot access company B resources (returns 403, not 404)
+- [x] `test_permission_hr_admin` — hr_admin can CRUD their company's resources
+- [x] `test_permission_manager` — manager can read but not write beyond scope
+- [ ] `test_permission_employee` — employee can only access own record and clock-in/out (no Employee model/clock-in endpoint exists yet)
 - [ ] `test_pagination_limit` — page_size > 100 returns 400
 - [ ] `test_idempotency_key_replay` — same key on duplicate POST returns original response
-- [ ] `test_create_validation_error` — invalid input returns 400 with details
-- [ ] `test_not_found_returns_404` — valid UUID not in company returns 404
-- [ ] `test_cross_company_returns_403` — resource from other company returns 403
+- [x] `test_create_validation_error` — invalid input returns 400 with details
+- [x] `test_not_found_returns_404` — valid UUID not in company returns 404
+- [x] `test_cross_company_returns_403` — resource from other company returns 403
 
 ---
 

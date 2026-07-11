@@ -21,8 +21,8 @@
 
 ### Tasks
 
-- [ ] Django project structure with app separation: `apps/companies`, `apps/users`, `apps/audit`, `apps/departments`, `apps/documents`, `apps/attendance`, `apps/hse`, `apps/payroll`
-- [ ] `apps/shared/` with cross-module utilities:
+- [x] Django project structure with app separation: `apps/companies`, `apps/users`, `apps/audit`, `apps/departments`, `apps/documents`, `apps/attendance`, `apps/hse`, `apps/payroll`
+- [x] `apps/shared/` with cross-module utilities:
   - `utils/dates.py` — `get_current_utc_datetime()`, `get_current_date()`, `days_until()`, `is_date_expired()`
   - `utils/ids.py` — `generate_uuid()`, `generate_emp_number()`
   - `utils/security.py` — `hash_token()`, `generate_secure_token()`, `mask_sensitive_value()`
@@ -30,13 +30,13 @@
   - `mixins/timestamped.py` — `TimestampedModel` abstract base
   - `logging/logger.py` — `get_logger()`, `log_function_call()` decorator
   - `logging/context.py` — `bind_request_context()`, `bind_task_context()`
-- [ ] `TenantModel` — abstract base model with `company` FK + `TenantManager`
-- [ ] `TenantManager` — custom ORM manager with `.for_company(company_id)` method
-- [ ] `TenantMiddleware` — attaches `request.company_id` from JWT
-- [ ] Base settings split: `settings/base.py`, `settings/local.py`, `settings/production.py`
-- [ ] PostgreSQL connection configured
-- [ ] `pydantic-settings` for environment/secrets management
-- [ ] `structlog` + `django-structlog` configured
+- [x] `TenantModel` — abstract base model with `company` FK + `TenantManager`
+- [x] `TenantManager` — custom ORM manager with `.for_company(company_id)` method
+- [x] `TenantMiddleware` — attaches `request.company_id` from JWT
+- [x] Base settings split: `settings/base.py`, `settings/local.py`, `settings/production.py`
+- [x] PostgreSQL connection configured
+- [x] `pydantic-settings` for environment/secrets management
+- [x] `structlog` + `django-structlog` configured
 
 ### Done When
 
@@ -52,12 +52,12 @@
 
 ### Tasks
 
-- [ ] `Company` model — name, industry, subscription tier, active flag, geofence fields, timestamps
-- [ ] `SubscriptionPlan` model — `has_attendance`, `has_hse`, `has_payroll` flags
-- [ ] `CompanySubscription` model — links company to plan, billing period, active employee count
-- [ ] Django Admin registration for all three models
-- [ ] `apps/companies/constants.py` — all business constants (BPJS rates, PTKP values, etc.)
-- [ ] `apps/companies/choices.py` — all TextChoices classes
+- [x] `Company` model — name, industry, subscription tier, active flag, geofence fields, timestamps
+- [x] `SubscriptionPlan` model — `has_attendance`, `has_hse`, `has_payroll` flags
+- [x] `CompanySubscription` model — links company to plan, billing period, active employee count
+- [x] Django Admin registration for all three models
+- [x] `apps/companies/constants.py` — all business constants (BPJS rates, PTKP values, etc.)
+- [x] `apps/companies/choices.py` — all TextChoices classes
 
 ### Done When
 
@@ -73,19 +73,19 @@
 
 ### Tasks
 
-- [ ] Custom `AuthUser` model extending `AbstractBaseUser` — email login, role field, company FK
-- [ ] Role choices: `platform_admin`, `hr_admin`, `manager`, `employee`, `hse_officer`
-- [ ] JWT authentication via `djangorestframework-simplejwt`
+- [x] Custom `AuthUser` model extending `AbstractBaseUser` — email login, role field, company FK
+- [x] Role choices: `platform_admin`, `hr_admin`, `manager`, `employee`, `hse_officer`
+- [x] JWT authentication via `djangorestframework-simplejwt`
   - Access token: short-lived (60 min)
   - Refresh token: long-lived (30 days)
-- [ ] `RefreshToken` model — `token_hash`, `expires_at`, `device_id`, `is_revoked`
-- [ ] `POST /api/v1/auth/login` — exchange email + password for tokens
-- [ ] `POST /api/v1/auth/token/refresh` — refresh access token
-- [ ] `POST /api/v1/auth/logout` — revoke refresh token
-- [ ] `POST /api/v1/auth/password/change` — change own password
-- [ ] `LoginSchema` in `apps/users/schemas.py`
-- [ ] Auth service in `apps/users/services/auth.py`
-- [ ] `TenantMiddleware` update: extract `company_id` from JWT payload
+- [x] `RefreshToken` model — `token_hash`, `expires_at`, `device_id`, `is_revoked`
+- [x] `POST /api/v1/auth/login` — exchange email + password for tokens
+- [x] `POST /api/v1/auth/token/refresh` — refresh access token
+- [x] `POST /api/v1/auth/logout` — revoke refresh token
+- [x] `POST /api/v1/auth/password/change` — change own password
+- [x] `LoginSchema` in `apps/users/schemas.py`
+- [x] Auth service in `apps/users/services/auth.py`
+- [x] `TenantMiddleware` update: extract `company_id` from JWT payload
 - [ ] Platform Admin: created via `manage.py createsuperuser` only — never JWT for HR dashboard
 
 ### Done When
@@ -103,16 +103,16 @@
 
 ### Tasks
 
-- [ ] `Department` model — name, code, company FK, parent self-FK, soft delete
-- [ ] CRUD API (HR Admin only):
+- [x] `Department` model — name, code, company FK, parent self-FK, soft delete
+- [x] CRUD API (HR Admin only):
   - `GET /api/v1/departments` — list with optional `parent_id`, `is_active` filters
   - `POST /api/v1/departments`
   - `GET /api/v1/departments/{id}`
   - `PATCH /api/v1/departments/{id}`
   - `DELETE /api/v1/departments/{id}` — soft delete
-- [ ] Department service in `apps/departments/services/department.py`
-- [ ] Serializer with nested children for org-chart
-- [ ] `DepartmentCreateSchema`, `DepartmentUpdateSchema`
+- [x] Department service in `apps/departments/services/department.py`
+- [x] Serializer with nested children for org-chart
+- [x] `DepartmentCreateSchema`, `DepartmentUpdateSchema`
 
 ### Done When
 
@@ -128,15 +128,15 @@
 
 ### Tasks
 
-- [ ] `Position` model — title, level, department FK, company FK, salary min/max, soft delete
-- [ ] CRUD API (HR Admin only):
+- [x] `Position` model — title, level, department FK, company FK, salary min/max, soft delete
+- [x] CRUD API (HR Admin only):
   - `GET /api/v1/positions` — list with `department_id`, `level` filters
   - `POST /api/v1/positions`
   - `GET /api/v1/positions/{id}`
   - `PATCH /api/v1/positions/{id}`
   - `DELETE /api/v1/positions/{id}` — soft delete
-- [ ] Position service in `apps/departments/services/position.py`
-- [ ] `select_related("department")` to avoid N+1
+- [x] Position service in `apps/departments/services/position.py`
+- [x] `select_related("department")` to avoid N+1
 
 ### Done When
 
@@ -207,21 +207,21 @@
 
 ### Tasks
 
-- [ ] DRF Permission classes:
+- [x] DRF Permission classes:
   - `IsPlatformAdmin`
   - `IsHRAdmin`
   - `IsManagerOrAbove`
   - `IsOwnerOrHRAdmin`
   - `IsHSEOfficerOrAbove`
   - `IsEmployee`
-- [ ] `apps/shared/permissions.py`
-- [ ] Standardized API error response format
-- [ ] `AuditLog` model — append-only, before/after JSON snapshots
-- [ ] Auto-hook AuditLog via Django signal or base serializer mixin
+- [x] `apps/shared/permissions.py`
+- [x] Standardized API error response format
+- [x] `AuditLog` model — append-only, before/after JSON snapshots
+- [x] Auto-hook AuditLog via Django signal or base serializer mixin
 - [ ] `Notification` model — table created for schema stability
-- [ ] Custom exception classes in `apps/users/exceptions.py`
-- [ ] `apps/shared/exceptions.py` — `NexusBaseError`
-- [ ] Shared pagination class in `apps/shared/utils/pagination.py`
+- [x] Custom exception classes in `apps/users/exceptions.py`
+- [x] `apps/shared/exceptions.py` — `NexusBaseError`
+- [x] Shared pagination class in `apps/shared/utils/pagination.py`
 
 ### Done When
 
