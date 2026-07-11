@@ -13,6 +13,7 @@ Scope notes:
 from __future__ import annotations
 
 from datetime import date, timedelta
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
 import factory
@@ -54,7 +55,7 @@ class SubscriptionPlanFactory(factory.django.DjangoModelFactory):
     has_attendance = False
     has_hse = False
     has_payroll = False
-    price_per_employee_per_month = factory.factories.Faker(
+    price_per_employee_per_month = factory.Faker(
         "pydecimal", left_digits=6, right_digits=2, positive=True
     )
     is_active = True
@@ -125,12 +126,13 @@ class FullPlanFactory(SubscriptionPlanFactory):
 # ---------------------------------------------------------------------------
 
 class DepartmentFactory(factory.django.DjangoModelFactory):
-    """Factory for Department (stub model — __str__ raises NotImplementedError)."""
+    """Factory for Department."""
 
     class Meta:
         model = "departments.Department"
 
     name = factory.Sequence(lambda n: f"Department {n}")
+    code = factory.Sequence(lambda n: f"DEPT{n:03d}")
     company = factory.SubFactory(CompanyFactory)
 
 
@@ -139,12 +141,15 @@ class DepartmentFactory(factory.django.DjangoModelFactory):
 # ---------------------------------------------------------------------------
 
 class PositionFactory(factory.django.DjangoModelFactory):
-    """Factory for Position (stub model — __str__ raises NotImplementedError)."""
+    """Factory for Position."""
 
     class Meta:
         model = "departments.Position"
 
     title = factory.Sequence(lambda n: f"Position {n}")
+    level = "staff"
+    base_salary_min = Decimal("5000000")
+    base_salary_max = Decimal("8000000")
     company = factory.SubFactory(CompanyFactory)
 
 
