@@ -25,6 +25,7 @@ dependencies = [
     "sentry-sdk[django]>=2.20",
     "structlog-sentry>=1.2",
     "drf-spectacular>=0.29.0",
+    "whitenoise>=6.7",
 ]
 
 [dependency-groups]
@@ -33,11 +34,29 @@ dev = [
     "factory-boy>=3.3",
     "freezegun>=1.5",
     "django-debug-toolbar>=4.4",
-    "black>=23.3.0",
     "ruff>=0.9.0",
     "pytest-cov>=7.1.0",
     "pytest-xdist>=3.8.0",
 ]
+
+[tool.ruff]
+line-length = 110
+target-version = "py314"
+exclude = ["migrations"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "DJ"]
+ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+# Django settings modules intentionally re-export via wildcard import.
+"config/settings/__init__.py" = ["F401", "F403"]
+"config/settings/local.py" = ["F401", "F403", "F405"]
+"config/settings/production.py" = ["F401", "F403", "F405"]
+
+[tool.ruff.lint.isort]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+known-first-party = ["apps", "config"]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings.local"
@@ -50,6 +69,27 @@ markers = [
     "unit: Unit test — single function/class, no DB or network I/O.",
     "integration: Integration test — multiple components, DB, services, or Celery tasks.",
     "feature: Feature test — full HTTP request/response cycle via DRF APIClient.",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["apps"]
+omit = [
+    "*/migrations/*",
+    "*/tests/*",
+    "*/admin.py",
+    "*/apps.py",
+    "manage.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "def __repr__",
 ]
 
 # ---------------------------------------------------------------------------

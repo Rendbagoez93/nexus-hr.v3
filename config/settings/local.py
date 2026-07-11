@@ -7,7 +7,7 @@ Local development settings.
 - Verbose logging
 """
 
-from .base import *
+from .base import *  # noqa: F401, F403
 
 DEBUG = True
 
@@ -45,9 +45,9 @@ try:
 except ImportError:
     pass
 else:
-    MIDDLEWARE = [
-        m for m in MIDDLEWARE if m != "django.middleware.security.SecurityMiddleware"
-    ] + ["whitenoise.middleware.WhiteNoiseMiddleware"]
+    MIDDLEWARE = [m for m in MIDDLEWARE if m != "django.middleware.security.SecurityMiddleware"] + [
+        "whitenoise.middleware.WhiteNoiseMiddleware"
+    ]
 
     # Allow whitenoise to serve static files without STATIC_ROOT set
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

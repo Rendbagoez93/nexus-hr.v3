@@ -1,19 +1,42 @@
 """
 Environment-common settings loaded via pydantic-settings.
 
-All secrets and environment-specific values are defined here.
+This module implements environment values as swappable "building blocks":
+
+- ``EnvCommon``      — fields and defaults shared by every environment.
+- ``LocalEnv``       — development building block. Permissive defaults,
+                        reads ``.env`` / ``.env.local``.
+- ``ProductionEnv``  — production building block. No insecure defaults —
+                        secrets with no safe default are declared without a
+                        default value, so pydantic raises a ``ValidationError``
+                        at startup if they're missing, instead of silently
+                        falling back to a dev value. Reads ``.env.production``.
+
+``get_env()`` picks the correct block based on the ``DJANGO_ENV`` variable —
+the same variable `config/settings/__init__.py` uses to choose between
+`local.py` and `production.py`. Both switches read the same variable, so the
+Django settings module and the pydantic settings values always agree.
+
 Never import Django models or settings here — this module is pydantic-only.
 """
 
+import os
 from functools import lru_cache
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field, field_validator
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
+
+
+def _split_comma_separated(value: object) -> object:
+    """Allow list fields (e.g. ALLOWED_HOSTS) to be written as "a,b,c" in a .env file."""
+    if isinstance(value, str):
+        return [item.strip() for item in value.split(",") if item.strip()]
+    return value
 
 
 class EnvCommon(BaseSettings):
-    """All environment-specific settings. Consumed by Django settings modules."""
+    """Fields and defaults shared by every environment."""
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -28,13 +51,9 @@ class EnvCommon(BaseSettings):
         description="Django secret key. Must be unique and unpredictable in production.",
     )
     DEBUG: bool = Field(default=False, description="Never True in production.")
-    ALLOWED_HOSTS: list[str] = Field(
+    ALLOWED_HOSTS: Annotated[list[str], NoDecode] = Field(
         default=["localhost", "127.0.0.1"],
         description="Hosts/domains the Django site can serve.",
-    )
-    DJANGO_SETTINGS_MODULE: str = Field(
-        default="config.settings.local",
-        description="Active settings module. Override in production.",
     )
 
     # ── Database — PostgreSQL via psycopg v3 ─────────────────────────────────
@@ -45,54 +64,76 @@ class EnvCommon(BaseSettings):
     DB_PORT: int = Field(default=5433, description="PostgreSQL port.")
 
     # ── Redis ──────────────────────────────────────────────────────────────────
-    # Uncomment redis service in docker-compose.yml to enable caching
-    # redis_url: str = Field(default="redis://localhost:6379/0")
-
-    # ── S3 / Storage ───────────────────────────────────────────────────────────
-    # PRODUCTION ONLY — Uncomment when configuring S3 for production file storage
-    # For local dev, use MinIO via docker-compose.yml or local filesystem
-    # aws_access_key_id: str = Field(default="")
-    # aws_secret_access_key: str = Field(default="")
-    # aws_s3_bucket_name: str = Field(default="nexus-hr")
-    # aws_s3_endpoint_url: str | None = Field(default=None)  # Set for MinIO in dev
-    # aws_s3_region_name: str = Field(default="us-east-1")
+    REDIS_URL: str = Field(default="redis://localhost:6379/0", description="Cache / session store.")
 
     # ── JWT ────────────────────────────────────────────────────────────────────
-    jwt_access_token_lifetime_minutes: int = Field(default=60)
-    jwt_refresh_token_lifetime_days: int = Field(default=30)
+    JWT_ACCESS_TOKEN_LIFETIME_MINUTES: int = Field(default=60)
+    JWT_REFRESH_TOKEN_LIFETIME_DAYS: int = Field(default=30)
 
     # ── Email ─────────────────────────────────────────────────────────────────
     # Dev defaults point to MailHog (see docker-compose.yml)
     # SMTP: localhost:1025, Web UI: http://localhost:8025
-    email_host: str = Field(default="localhost")
-    email_port: int = Field(default=1025)
-    email_host_user: str = Field(default="")
-    email_host_password: str = Field(default="")
-    email_use_tls: bool = Field(default=False)
-    email_from: str = Field(default="noreply@nexus-hr.local")
-
-    # PRODUCTION ONLY — Configure real SMTP in production .env
-    # email_host: str = Field(default="smtp.example.com")
-    # email_port: int = Field(default=587)
-    # email_use_tls: bool = Field(default=True)
+    EMAIL_HOST: str = Field(default="localhost")
+    EMAIL_PORT: int = Field(default=1025)
+    EMAIL_HOST_USER: str = Field(default="")
+    EMAIL_HOST_PASSWORD: str = Field(default="")
+    EMAIL_USE_TLS: bool = Field(default=False)
+    EMAIL_FROM: str = Field(default="noreply@nexus-hr.local")
 
     # ── Sentry ─────────────────────────────────────────────────────────────────
-    # PRODUCTION ONLY — Error tracking and performance monitoring
-    # Leave empty in development to disable Sentry
-    # sentry_dsn: str = Field(default="")
-    # sentry_environment: Literal["development", "staging", "production"] = Field(
-    #     default="development"
-    # )
-
-    # ── Celery ─────────────────────────────────────────────────────────────────
-    # Requires Redis (uncomment redis service in docker-compose.yml)
-    # celery_broker_url: str = Field(default="redis://localhost:6379/1")
-    # celery_result_backend: str = Field(default="redis://localhost:6379/2")
+    # Leave SENTRY_DSN empty to disable Sentry (default for development).
+    SENTRY_DSN: str = Field(default="")
+    SENTRY_ENVIRONMENT: Literal["development", "staging", "production"] = Field(default="development")
 
     # ── Logging ─────────────────────────────────────────────────────────────────
-    log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = Field(default="INFO")
+    LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = Field(default="INFO")
+
+    @field_validator("ALLOWED_HOSTS", mode="before")
+    @classmethod
+    def _parse_allowed_hosts(cls, value: object) -> object:
+        return _split_comma_separated(value)
+
+
+class LocalEnv(EnvCommon):
+    """Development building block — permissive defaults, safe to run with zero .env file."""
+
+    model_config = SettingsConfigDict(
+        env_file=(".env", ".env.local"),
+        env_file_encoding="utf-8",
+        case_sensitive=True,
+        extra="ignore",
+    )
+
+    DEBUG: bool = Field(default=True)
+
+
+class ProductionEnv(EnvCommon):
+    """Production building block — required secrets have no default and fail fast if unset."""
+
+    model_config = SettingsConfigDict(
+        env_file=".env.production",
+        env_file_encoding="utf-8",
+        case_sensitive=True,
+        extra="ignore",
+    )
+
+    SECRET_KEY: str  # required — no insecure default in production
+    DEBUG: bool = Field(default=False)
+    ALLOWED_HOSTS: Annotated[list[str], NoDecode]  # required — must be explicit in production
+    DB_PASSWORD: str  # required — no default DB password in production
+    REDIS_URL: str  # required
+    SENTRY_ENVIRONMENT: Literal["development", "staging", "production"] = Field(default="production")
 
 
 @lru_cache
 def get_env() -> EnvCommon:
-    return EnvCommon()
+    """Return the settings "building block" for the active environment.
+
+    Reads DJANGO_ENV — the same variable `config/settings/__init__.py` uses
+    to choose between `local.py` and `production.py` — so both switches
+    always agree on which environment is active.
+    """
+    environment = os.environ.get("DJANGO_ENV", "local")
+    if environment == "production":
+        return ProductionEnv()
+    return LocalEnv()

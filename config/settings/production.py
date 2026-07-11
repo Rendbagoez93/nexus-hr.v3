@@ -7,29 +7,31 @@ Production settings.
 - Sentry error tracking
 """
 
-from .base import *
+from .base import *  # noqa: F401, F403
 
 DEBUG = False
 
-ALLOWED_HOSTS = [h.strip() for h in env.allowed_hosts.split(",") if h.strip()]
+# env.ALLOWED_HOSTS is already a parsed list[str] (comma-separated .env values
+# are split by the ALLOWED_HOSTS validator in envcommon.py).
+ALLOWED_HOSTS = env.ALLOWED_HOSTS
 
 # ── Email ────────────────────────────────────────────────────────────────────
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = env.email_host
-EMAIL_PORT = env.email_port
-EMAIL_HOST_USER = env.email_host_user
-EMAIL_HOST_PASSWORD = env.email_host_password
-EMAIL_USE_TLS = env.email_use_tls
-DEFAULT_FROM_EMAIL = env.email_from
+EMAIL_HOST = env.EMAIL_HOST
+EMAIL_PORT = env.EMAIL_PORT
+EMAIL_HOST_USER = env.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = env.EMAIL_HOST_PASSWORD
+EMAIL_USE_TLS = env.EMAIL_USE_TLS
+DEFAULT_FROM_EMAIL = env.EMAIL_FROM
 
 # ── Sentry ───────────────────────────────────────────────────────────────────
-if env.sentry_dsn:
+if env.SENTRY_DSN:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
 
     sentry_sdk.init(
-        dsn=env.sentry_dsn,
-        environment=env.sentry_environment,
+        dsn=env.SENTRY_DSN,
+        environment=env.SENTRY_ENVIRONMENT,
         integrations=[DjangoIntegration()],
         traces_sample_rate=0.05,
         send_default_pii=False,
@@ -49,6 +51,6 @@ CELERY_TASK_ALWAYS_EAGER = False
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": env.redis_url,
+        "LOCATION": env.REDIS_URL,
     }
 }

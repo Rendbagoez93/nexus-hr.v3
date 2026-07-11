@@ -8,6 +8,7 @@ from datetime import timedelta
 from pathlib import Path
 
 from .envcommon import get_env
+from .logging import build_logging_config, configure_structlog
 
 env = get_env()
 
@@ -159,8 +160,8 @@ REST_FRAMEWORK = {
 # ── Simple JWT ─────────────────────────────────────────────────────────────────
 # JWT settings will be configured in Phase 3
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=env.jwt_access_token_lifetime_minutes),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=env.jwt_refresh_token_lifetime_days),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=env.JWT_ACCESS_TOKEN_LIFETIME_MINUTES),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=env.JWT_REFRESH_TOKEN_LIFETIME_DAYS),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
@@ -245,67 +246,7 @@ CACHES = {
 
 
 # ── Structured Logging (structlog + django-structlog) ─────────────────────────
-LOG_LEVEL = env.log_level
+LOG_LEVEL = env.LOG_LEVEL
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "console": {
-            "format": "%(asctime)s %(levelname)s %(name)s — %(message)s",
-        },
-    },
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "formatter": "console",
-        },
-    },
-    "root": {
-        "handlers": ["console"],
-        "level": LOG_LEVEL,
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "django.server": {
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "nexus": {
-            "handlers": ["console"],
-            "level": LOG_LEVEL,
-            "propagate": False,
-        },
-        "celery": {
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
-        },
-    },
-}
-
-import structlog
-
-structlog.configure(
-    processors=[
-        structlog.contextvars.merge_contextvars,
-        structlog.stdlib.add_log_level,
-        structlog.stdlib.add_logger_name,
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.processors.StackInfoRenderer(),
-        structlog.processors.format_exc_info,
-        structlog.processors.UnicodeDecoder(),
-        structlog.processors.JSONRenderer()
-        if not DEBUG
-        else structlog.dev.ConsoleRenderer(colors=True),
-    ],
-    wrapper_class=structlog.stdlib.BoundLogger,
-    context_class=dict,
-    logger_factory=structlog.stdlib.LoggerFactory(),
-    cache_logger_on_first_use=True,
-)
+configure_structlog()
+LOGGING = build_logging_config(debug=DEBUG, log_level=LOG_LEVEL)

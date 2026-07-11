@@ -33,7 +33,7 @@ Four core modules: **Core** (employee master data, auth), **Attendance & Leave**
 | File Storage | AWS S3 / MinIO via `django-storages[s3]` |
 | Task Queue | Celery + Redis (`django-celery-beat`, `django-celery-results`) |
 | Logging | `structlog` + `django-structlog` + `sentry-sdk` |
-| Dev Tools | `pytest-django`, `factory-boy`, `ruff`, `black` |
+| Dev Tools | `pytest-django`, `factory-boy`, `ruff` |
 
 ---
 
