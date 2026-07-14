@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class DepartmentCreateRequest(BaseModel):
@@ -38,6 +38,8 @@ class DepartmentUpdateRequest(BaseModel):
 
 
 class DepartmentResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     company_id: str
     code: str
@@ -46,9 +48,6 @@ class DepartmentResponse(BaseModel):
     is_active: bool
     created_at: str
     updated_at: str
-
-    class Config:
-        from_attributes = True
 
 
 class PositionCreateRequest(BaseModel):
@@ -86,6 +85,8 @@ class PositionUpdateRequest(BaseModel):
 
 
 class PositionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     company_id: str
     department_id: str
@@ -96,6 +97,3 @@ class PositionResponse(BaseModel):
     is_active: bool
     created_at: str
     updated_at: str
-
-    class Config:
-        from_attributes = True
