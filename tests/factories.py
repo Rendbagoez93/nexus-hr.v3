@@ -23,6 +23,7 @@ from django.utils import timezone
 if TYPE_CHECKING:
     from apps.companies.models import Company, CompanySubscription, SubscriptionPlan
     from apps.departments.models import Department, Position
+    from apps.employees.models import Employee
     from apps.users.models import AuthUser
 
 
@@ -164,12 +165,17 @@ class BaseUserFactory(factory.django.DjangoModelFactory):
         model = "users.AuthUser"
 
     email = factory.Sequence(lambda n: f"user{n}@test.local")
-    password = factory.PostGenerationMethodCall("set_password", "TestPass123!")
+    password = "TestPass123!"
     is_active = True
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        """Use the manager to support custom manager logic."""
+        """Use the manager to support custom manager logic.
+
+        `password` is passed straight through to `create_user`/`create_superuser`,
+        which already calls `set_password()` and saves once — avoiding the extra
+        post-generation save that `PostGenerationMethodCall` would trigger.
+        """
         manager = model_class.objects
         return manager.create_user(*args, **kwargs)
 
@@ -240,3 +246,38 @@ class InactiveUserFactory(BaseUserFactory):
     is_active = False
     role = "employee"
     company = factory.SubFactory(CompanyFactory)
+
+
+# ---------------------------------------------------------------------------
+# Employee factories
+# ---------------------------------------------------------------------------
+
+class EmployeeFactory(factory.django.DjangoModelFactory):
+    """Factory for Employee — each call creates a unique employee per company."""
+
+    class Meta:
+        model = "employees.Employee"
+
+    company = factory.SubFactory(CompanyFactory)
+    user = None
+    emp_number = factory.Sequence(lambda n: f"NXS-{n:04d}")
+    first_name = factory.Sequence(lambda n: f"FirstName{n}")
+    last_name = factory.Sequence(lambda n: f"LastName{n}")
+    email = factory.Sequence(lambda n: f"employee{n}@nexus.test")
+    phone = factory.Sequence(lambda n: f"0813{n:08d}")
+    mobile_phone = factory.Sequence(lambda n: f"0814{n:08d}")
+    gender = "male"
+    date_of_birth = "1990-01-01"
+    place_of_birth = "Jakarta"
+    id_card_address = factory.Sequence(lambda n: f"Address {n}, Jakarta")
+    residential_address = factory.Sequence(lambda n: f"Residence {n}, Jakarta")
+    department = None
+    position = None
+    status = "active"
+    employment_type = "permanent"
+    join_date = "2020-01-01"
+    resign_date = None
+    termination_date = None
+    termination_reason = ""
+    base_salary = Decimal("10000000.00")
+    direct_manager = None
