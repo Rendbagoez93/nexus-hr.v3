@@ -71,6 +71,10 @@ markers = [
     "feature: Feature test — full HTTP request/response cycle via DRF APIClient.",
 ]
 
+log_level = "DEBUG"
+log_format = "%(asctime)s %(levelname)-8s %(name)s %(message)s"
+log_date_format = "%Y-%m-%d %H:%M:%S"
+
 [tool.coverage.run]
 branch = true
 source = ["apps"]

@@ -14,6 +14,11 @@ in tests/factories.py, not Model.objects.create() directly.
 from __future__ import annotations
 
 import os
+import logging
+import structlog
+
+from config.settings.logging import shared_processors
+
 from datetime import date, timedelta
 from typing import TYPE_CHECKING, Generator
 
@@ -39,6 +44,23 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
 def pytest_configure() -> None:
     import django
     django.setup()
+
+# --- per-worker log file ---
+    worker_id = os.environ.get("PYTEST_XDIST_WORKER", "master")
+    os.makedirs("logs/tests", exist_ok=True)
+
+    formatter = structlog.stdlib.ProcessorFormatter(
+        processors=[
+            structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+            structlog.processors.JSONRenderer(),
+        ],
+        foreign_pre_chain=shared_processors,
+    )
+    handler = logging.FileHandler(f"logs/tests/{worker_id}.log", encoding="utf-8")
+    handler.setFormatter(formatter)
+    handler.setLevel(logging.DEBUG)
+
+    logging.getLogger("nexus").addHandler(handler)
 
 
 # ---------------------------------------------------------------------------
