@@ -331,10 +331,9 @@ def hr_admin_client(db, company: "Company"):
     from tests.factories import HRAdminFactory
 
     user = HRAdminFactory(company=company)
-    api_client = APIClient()
-    api_client.force_authenticate(user=user)
-    api_client.handler._force_user = user
-    return api_client
+    client = APIClient()
+    client.force_authenticate(user=user)
+    return client
 
 
 @pytest.fixture
@@ -344,36 +343,37 @@ def manager_client(db, company: "Company"):
     from tests.factories import ManagerFactory
 
     user = ManagerFactory(company=company)
-    api_client = APIClient()
-    api_client.force_authenticate(user=user)
-    api_client.handler._force_user = user
-    return api_client
+    client = APIClient()
+    client.force_authenticate(user=user)
+    return client
 
 
 @pytest.fixture
-def employee_client(db, company: "Company"):
-    """Authenticated APIClient for a plain Employee within company."""
+def employee_client(db, employee_with_user: "Employee"):
+    """
+    Authenticated APIClient for a plain Employee within company.
+
+    Authenticated as the AuthUser linked to `employee_with_user`, so tests
+    that assert "own record" access can request that employee's record
+    and get a match.
+    """
     from rest_framework.test import APIClient
-    from tests.factories import EmployeeUserFactory
 
-    user = EmployeeUserFactory(company=company)
-    api_client = APIClient()
-    api_client.force_authenticate(user=user)
-    api_client.handler._force_user = user
-    return api_client
+    client = APIClient()
+    client.force_authenticate(user=employee_with_user.user)
+    return client
 
 
 @pytest.fixture
-def other_company_client(db):
+def other_company_client(db, employee_other_company: "Employee"):
     """APIClient authenticated as HR Admin in a second, unrelated company."""
     from rest_framework.test import APIClient
     from tests.factories import HRAdminFactory
 
-    user = HRAdminFactory()
-    api_client = APIClient()
-    api_client.force_authenticate(user=user)
-    api_client.handler._force_user = user
-    return api_client
+    user = HRAdminFactory(company=employee_other_company.company)
+    client = APIClient()
+    client.force_authenticate(user=user)
+    return client
 
 
 @pytest.fixture
@@ -383,7 +383,6 @@ def platform_admin_client(db):
     from tests.factories import PlatformAdminFactory
 
     user = PlatformAdminFactory()
-    api_client = APIClient()
-    api_client.force_authenticate(user=user)
-    api_client.handler._force_user = user
-    return api_client
+    client = APIClient()
+    client.force_authenticate(user=user)
+    return client

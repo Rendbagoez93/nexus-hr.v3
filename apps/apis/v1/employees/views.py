@@ -6,8 +6,6 @@ Employee API endpoints:
   POST   /api/v1/employees/           — create (+ optional AuthUser)
   GET    /api/v1/employees/{id}/      — retrieve
   PATCH  /api/v1/employees/{id}/      — partial update
-  DELETE /api/v1/employees/{id}/      — soft delete
-  POST   /api/v1/employees/{id}/restore/  — restore
   POST   /api/v1/employees/{id}/deactivate/ — deactivate (resign)
   GET    /api/v1/me/                  — self-service: own employee record
 """
@@ -27,7 +25,7 @@ from apps.employees.schemas import (
     EmployeeUpdateSchema,
 )
 from apps.employees.services.employee_service import EmployeeService
-from apps.shared.permissions import IsHRAdmin
+from apps.shared.permissions import IsHRAdmin, IsOwnerOrHRAdmin
 from apps.shared.utils.pagination import NexusPaginator
 
 
@@ -42,15 +40,10 @@ class EmployeeViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_permissions(self):
-        if self.action in [
-            "create",
-            "update",
-            "partial_update",
-            "destroy",
-            "restore",
-            "deactivate",
-        ]:
+        if self.action in ["create", "partial_update", "deactivate"]:
             return [IsAuthenticated(), IsHRAdmin()]
+        if self.action == "retrieve":
+            return [IsAuthenticated(), IsOwnerOrHRAdmin()]
         return [IsAuthenticated()]
 
     def _company_id(self, request) -> UUID:
@@ -60,6 +53,36 @@ class EmployeeViewSet(viewsets.ViewSet):
 
             raise PermissionDenied("No company associated with this user.")
         return user.company_id
+
+    def _get_employee(self, pk: str, company_id: UUID):
+        """
+        Fetch employee by pk, enforcing tenant boundary.
+
+        Raises EmployeeError (403/404) on failure — caught by DRF's
+        exception handler and converted to a proper Response.
+        """
+        return EmployeeService.get_by_id(pk, company_id)
+
+    def _validation_error_response(self, exc: ValidationError) -> Response:
+        """Return a standard error envelope from a Pydantic ValidationError."""
+        errors = exc.errors()
+        details = {}
+        for err in errors:
+            loc_tuple = err["loc"]
+            if len(loc_tuple) == 1:
+                details[str(loc_tuple[0])] = [err["msg"]]
+            else:
+                key = ".".join(str(p) for p in loc_tuple)
+                details[key] = [err["msg"]]
+        return Response(
+            {
+                "error": "validation_error",
+                "message": "Request validation failed.",
+                "status": 400,
+                "details": details,
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     def list(self, request):
         """
@@ -84,7 +107,12 @@ class EmployeeViewSet(viewsets.ViewSet):
             department_id_parsed = UUID(department_id) if department_id else None
         except ValueError:
             return Response(
-                {"detail": "department_id must be a valid UUID."},
+                {
+                    "error": "validation_error",
+                    "message": "department_id must be a valid UUID.",
+                    "status": 400,
+                    "details": {"department_id": ["Must be a valid UUID."]},
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -109,11 +137,8 @@ class EmployeeViewSet(viewsets.ViewSet):
 
         try:
             schema = EmployeeCreateSchema.model_validate(request.data)
-        except ValidationError as e:
-            return Response(
-                {"detail": str(e) if e.error_count() else "Validation failed."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        except ValidationError as exc:
+            return self._validation_error_response(exc)
 
         employee = EmployeeService.create(
             company_id=company_id,
@@ -147,16 +172,18 @@ class EmployeeViewSet(viewsets.ViewSet):
         )
 
         serializer = EmployeeSerializer(employee)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({"data": serializer.data}, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
         """
         GET /api/v1/employees/{id}/
+        Permission: IsOwnerOrHRAdmin — enforced via check_object_permissions().
         """
         company_id = self._company_id(request)
-        employee = EmployeeService.get_by_id(pk, company_id)
+        employee = self._get_employee(pk, company_id)
+        self.check_object_permissions(request, employee)
         serializer = EmployeeSerializer(employee)
-        return Response(serializer.data)
+        return Response({"data": serializer.data})
 
     def partial_update(self, request, pk=None):
         """
@@ -166,11 +193,8 @@ class EmployeeViewSet(viewsets.ViewSet):
 
         try:
             schema = EmployeeUpdateSchema.model_validate(request.data)
-        except ValidationError as e:
-            return Response(
-                {"detail": str(e) if e.error_count() else "Validation failed."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        except ValidationError as exc:
+            return self._validation_error_response(exc)
 
         fields = schema.model_dump(exclude_unset=True)
 
@@ -186,50 +210,32 @@ class EmployeeViewSet(viewsets.ViewSet):
 
         employee = EmployeeService.update(pk=pk, company_id=company_id, **fields)
         serializer = EmployeeSerializer(employee)
-        return Response(serializer.data)
-
-    def destroy(self, request, pk=None):
-        """
-        DELETE /api/v1/employees/{id}/ — soft delete
-        """
-        company_id = self._company_id(request)
-        EmployeeService.soft_delete(pk, company_id)
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    @action(detail=True, methods=["post"], url_path="restore")
-    def restore(self, request, pk=None):
-        """
-        POST /api/v1/employees/{id}/restore/
-        """
-        company_id = self._company_id(request)
-        employee = EmployeeService.restore(pk, company_id)
-        serializer = EmployeeSerializer(employee)
-        return Response(serializer.data)
+        return Response({"data": serializer.data})
 
     @action(detail=True, methods=["post"], url_path="deactivate")
     def deactivate(self, request, pk=None):
         """
         POST /api/v1/employees/{id}/deactivate/
         Sets status to 'resigned' and records resign_date.
+        Returns a message envelope (action confirmation).
         """
         company_id = self._company_id(request)
 
         try:
             schema = DeactivateEmployeeSchema.model_validate(request.data)
-        except ValidationError as e:
-            return Response(
-                {"detail": str(e) if e.error_count() else "Validation failed."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        except ValidationError as exc:
+            return self._validation_error_response(exc)
 
-        employee = EmployeeService.deactivate(
+        EmployeeService.deactivate(
             pk=pk,
             company_id=company_id,
             resign_date=schema.resign_date,
             termination_reason=schema.termination_reason,
         )
-        serializer = EmployeeSerializer(employee)
-        return Response(serializer.data)
+        return Response(
+            {"message": "Employee deactivated successfully."},
+            status=status.HTTP_200_OK,
+        )
 
 
 class MeViewSet(viewsets.ViewSet):
@@ -256,4 +262,4 @@ class MeViewSet(viewsets.ViewSet):
 
         employee = EmployeeService.get_by_user(user_id)
         serializer = EmployeeSerializer(employee)
-        return Response(serializer.data)
+        return Response({"data": serializer.data})

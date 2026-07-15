@@ -42,7 +42,7 @@ class IsOwnerOrHRAdmin(permissions.BasePermission):
         user = request.user
         if not (user and user.is_authenticated):
             return False
-        if getattr(user, "role", None) in ("platform_admin", "hr_admin"):
+        if getattr(user, "role", None) in ("platform_admin", "hr_admin", "manager"):
             return True
         # Check if obj has user FK
         obj_user_id = getattr(obj, "user_id", None) or getattr(obj, "user", None)

@@ -73,6 +73,13 @@ class EmployeeService:
         if status:
             qs = qs.filter(status=status)
         if department_id:
+            from apps.departments.models import Department
+
+            valid_ids = list(
+                Department.objects.for_company(company_id).values_list("pk", flat=True)
+            )
+            if department_id not in valid_ids:
+                return qs.none()
             qs = qs.filter(department_id=department_id)
         return qs.select_related(
             "department", "position", "direct_manager", "company"
@@ -247,15 +254,15 @@ class EmployeeService:
                     detail="Direct manager not found.", status_code=404
                 )
 
-        created_user: AuthUser | None = None
+        auth_user: AuthUser | None = None
         if create_user:
-            created_user = AuthUser.objects.create_user(
+            auth_user = AuthUser.objects.create_user(
                 email=user_email,
                 password=user_password,
                 company_id=company_id,
                 role="employee",
             )
-            employee.user = created_user
+            employee.user = auth_user
 
         try:
             employee.save()
