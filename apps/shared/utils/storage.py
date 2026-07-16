@@ -7,14 +7,14 @@ S3 / Django file storage helpers.
 from datetime import datetime, timedelta, timezone
 from typing import BinaryIO
 
-from django.core.files.storage import get_storage_class
+from django.core.files.storage import default_storage
 
 from apps.shared.utils.ids import generate_document_key
 
 
 def get_storage():
     """Return the configured default storage backend (S3 or filesystem)."""
-    return get_storage_class()()
+    return default_storage
 
 
 def upload_file(
@@ -31,18 +31,14 @@ def upload_file(
     Args:
         file_obj: File-like object to upload.
         key: Storage key (path) for the file.
-        content_type: MIME type (used for S3 Content-Type header).
-        acl: S3 canned ACL. Default 'private'.
+        content_type: MIME type (used for S3 Content-Type header). django-storages'
+            S3Boto3Storage infers this automatically from the file name/content, so
+            it isn't passed through explicitly here.
+        acl: S3 canned ACL. Default 'private'. Configured at the storage-class level
+            (AWS_DEFAULT_ACL / AWS_S3_OBJECT_PARAMETERS in settings), not per-call.
     """
     storage = get_storage()
-    kwargs: dict = {}
-    if content_type:
-        kwargs["content_type"] = content_type
-    if hasattr(storage, "bucket") and acl:
-        # boto3 / S3 backend
-        kwargs["extra_args"] = {"ACL": acl}
-
-    saved = storage.save(key, file_obj, **kwargs)
+    saved = storage.save(key, file_obj)
     return saved
 
 
@@ -58,11 +54,11 @@ def generate_signed_url(
     """
     storage = get_storage()
 
-    if hasattr(storage, "url"):
-        # S3 / boto3 backend
+    if hasattr(storage, "bucket"):
+        # S3 / boto3 backend — supports an `expire` (seconds) kwarg.
         return storage.url(key, expire=expires_in_minutes * 60)
 
-    # Local filesystem fallback
+    # Local filesystem fallback — Storage.url() takes no expiry kwarg.
     return storage.url(key)
 
 
