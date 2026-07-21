@@ -1,0 +1,59 @@
+/*
+ * auth.css
+ * Chromeless layout for the authentication pages (login). No nav/sidebar —
+ * a single centred card on the page background.
+ */
+
+.auth-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-base);
+}
+
+.auth-shell .logo {
+  margin-bottom: var(--space-2xl);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-xl);
+}
+
+.auth-card h1 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  margin-bottom: var(--space-2xs);
+}
+
+.auth-card > p {
+  color: var(--color-text-muted);
+  font-size: 14px;
+  margin-bottom: var(--space-xl);
+}
+
+.auth-footer {
+  margin-top: var(--space-xl);
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-subtle);
+}
+
+.auth-back-link {
+  margin-top: var(--space-2xl);
+  font-size: 14px;
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+}
+
+.auth-back-link:hover {
+  color: var(--color-text);
+}

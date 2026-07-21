@@ -1,0 +1,295 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ nexus_app_name }} — Centralized Employee Data Management</title>
+  <meta name="description" content="Nexus is a centralized employee data management platform for manufacturing, construction, mining, and office industries in Indonesia.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/welcome.css' %}">
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="container">
+      <a href="{% url 'web-home' %}" class="logo">
+        <span class="logo-mark">N</span>
+        <span class="logo-name">Nexus</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#modules">Modules</a></li>
+        <li><a href="#industries">Industries</a></li>
+        <li><a href="#how-it-works">How it works</a></li>
+      </ul>
+
+      <div class="nav-ctas">
+        {% if user.is_authenticated %}
+          <span class="nav-user">Signed in as <strong>{{ user.email }}</strong></span>
+          <form action="{% url 'web-logout' %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-ghost">Sign out</button>
+          </form>
+        {% else %}
+          <a href="{% url 'web-login' %}" class="btn btn-ghost">Login</a>
+          <a href="{% url 'web-login' %}" class="btn btn-primary">Get Started</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <main>
+
+    {% if messages %}
+      <div class="container" style="padding-top: 84px;">
+        {% for message in messages %}
+          <div class="alert {% if message.tags == 'error' %}alert-error{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <section class="hero">
+      <div class="container">
+        <div class="hero-copy">
+          <span class="tag-pill"><span class="tag-pill-dot"></span> Centralized HR Platform</span>
+          <h1>One source of truth for your entire workforce.</h1>
+          <p>
+            Nexus centralizes employee data, attendance, HSE compliance, and
+            payroll for manufacturing, construction, mining, and office
+            companies across Indonesia — built around a single Employee
+            record that every module shares.
+          </p>
+          <div class="hero-actions">
+            <a href="{% url 'web-login' %}" class="btn btn-primary btn-xl">Get Started</a>
+            <a href="#modules" class="btn btn-outline btn-xl">See how it works</a>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="dashboard-mock">
+            <div class="dashboard-mock-header">
+              <span class="dashboard-mock-title">Site Roster · Today</span>
+              <span class="status-badge status-badge-success">Live</span>
+            </div>
+            <div class="dashboard-mock-row">
+              <div>
+                <div class="dashboard-mock-name">Budi Santoso</div>
+                <div class="dashboard-mock-sub">NXS-0001 · Site Engineer</div>
+              </div>
+              <span class="status-badge status-badge-success">Active</span>
+            </div>
+            <div class="dashboard-mock-row">
+              <div>
+                <div class="dashboard-mock-name">Siti Rahayu</div>
+                <div class="dashboard-mock-sub">NXS-0002 · HSE Officer</div>
+              </div>
+              <span class="status-badge status-badge-info">On Leave</span>
+            </div>
+            <div class="dashboard-mock-row">
+              <div>
+                <div class="dashboard-mock-name">Agus Prasetyo</div>
+                <div class="dashboard-mock-sub">NXS-0003 · Field Supervisor</div>
+              </div>
+              <span class="status-badge status-badge-warning">Pending</span>
+            </div>
+          </div>
+          <div class="floating-card floating-card-1">✓ Induction verified</div>
+          <div class="floating-card floating-card-2">⏱ 8h 12m man-hours</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="industry-strip" id="industries">
+      <div class="container">
+        <div class="industry-grid">
+          <div class="industry-card reveal">
+            <span class="industry-icon">🏭</span>
+            <span>Manufacturing</span>
+          </div>
+          <div class="industry-card reveal reveal-delay-1">
+            <span class="industry-icon">🏗️</span>
+            <span>Construction</span>
+          </div>
+          <div class="industry-card reveal reveal-delay-2">
+            <span class="industry-icon">⛏️</span>
+            <span>Mining</span>
+          </div>
+          <div class="industry-card reveal reveal-delay-3">
+            <span class="industry-icon">🏢</span>
+            <span>Office</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="modules">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="tag-pill">Platform Modules</span>
+          <h2>Four modules. One employee record.</h2>
+          <p>Start with Core, then add the modules your company needs — every module reads from the same Employee master data.</p>
+        </div>
+
+        <div class="feature-grid">
+          <div class="card reveal">
+            <div class="card-icon icon-blue">🧑‍💼</div>
+            <h3>Core</h3>
+            <p>Employee master data, departments, positions, documents, and authentication.</p>
+            <ul class="card-list">
+              <li>Single source of truth per employee</li>
+              <li>Document storage with signed URLs</li>
+              <li>Role-based access control</li>
+            </ul>
+          </div>
+
+          <div class="card reveal reveal-delay-1">
+            <div class="card-icon icon-cyan">🕒</div>
+            <h3>Attendance &amp; Leave</h3>
+            <p>Mobile clock-in/out with GPS and photo, shift schedules, and leave approvals.</p>
+            <ul class="card-list">
+              <li>Geofenced mobile clock-in/out</li>
+              <li>Shift-aware live status</li>
+              <li>Leave requests and balances</li>
+            </ul>
+          </div>
+
+          <div class="card reveal reveal-delay-2">
+            <div class="card-icon icon-amber">🦺</div>
+            <h3>HSE + Man Hours</h3>
+            <p>Violations, man-hour aggregation, inductions, and work permit tracking.</p>
+            <ul class="card-list">
+              <li>Induction and licence expiry alerts</li>
+              <li>Man-hour reporting</li>
+              <li>Work permit lifecycle</li>
+            </ul>
+          </div>
+
+          <div class="card reveal reveal-delay-3">
+            <div class="card-icon icon-green">💰</div>
+            <h3>Payroll</h3>
+            <p>Payroll runs, payslips, overtime, PPh 21, and BPJS calculations.</p>
+            <ul class="card-list">
+              <li>Indonesian tax &amp; BPJS compliance</li>
+              <li>Overtime and payslip history</li>
+              <li>Auditable payroll runs</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="reveal">
+            <div class="stat-value">500+</div>
+            <div class="stat-label">Companies onboarded</div>
+          </div>
+          <div class="reveal reveal-delay-1">
+            <div class="stat-value">50K+</div>
+            <div class="stat-label">Employees managed</div>
+          </div>
+          <div class="reveal reveal-delay-2">
+            <div class="stat-value">99.9%</div>
+            <div class="stat-label">Platform uptime</div>
+          </div>
+          <div class="reveal reveal-delay-3">
+            <div class="stat-value">24/7</div>
+            <div class="stat-label">Support coverage</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="how-it-works">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="tag-pill">How it works</span>
+          <h2>Up and running in three steps.</h2>
+          <p>Nexus is built to onboard a company and its full workforce without a lengthy implementation cycle.</p>
+        </div>
+
+        <div class="process-grid">
+          <div class="step-card reveal">
+            <div class="step-badge">1</div>
+            <h3>Onboard your company</h3>
+            <p>Create your tenant, invite your HR team, and choose the modules your subscription needs.</p>
+          </div>
+          <div class="step-card reveal reveal-delay-1">
+            <div class="step-badge">2</div>
+            <h3>Import your workforce</h3>
+            <p>Bring in departments, positions, and employee master data — the foundation every module builds on.</p>
+          </div>
+          <div class="step-card reveal reveal-delay-2">
+            <div class="step-badge">3</div>
+            <h3>Operate day to day</h3>
+            <p>Track attendance, HSE compliance, and payroll from one dashboard, backed by one employee record.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section cta-band">
+      <div class="container">
+        <h2>Ready to centralize your HR data?</h2>
+        <p>Sign in to your Nexus account to manage your workforce, or get in touch to set up a new company.</p>
+        <a href="{% url 'web-login' %}" class="btn btn-primary btn-xl">Get Started</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <div class="logo">
+            <span class="logo-mark">N</span>
+            <span class="logo-name">Nexus</span>
+          </div>
+          <p>Centralized Employee Data Management for manufacturing, construction, mining, and office industries in Indonesia.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#modules">Modules</a></li>
+            <li><a href="#industries">Industries</a></li>
+            <li><a href="#how-it-works">How it works</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="{% url 'web-login' %}">Login</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 Nexus HR. All rights reserved.</span>
+        <span>Made for Indonesian industry.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
