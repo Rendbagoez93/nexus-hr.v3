@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in — {{ nexus_app_name }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+<body>
+
+  <div class="auth-shell">
+    <a href="{% url 'web-home' %}" class="logo">
+      <span class="logo-mark">N</span>
+      <span class="logo-name">Nexus</span>
+    </a>
+
+    <div class="auth-card">
+      <h1>Sign in to Nexus</h1>
+      <p>Enter your company email and password to continue.</p>
+
+      {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-error{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+
+      <form method="post" action="{% url 'web-login' %}" novalidate>
+        {% csrf_token %}
+
+        <div class="form-field">
+          <label class="form-label" for="id_email">Email</label>
+          <input
+            class="form-input"
+            type="email"
+            id="id_email"
+            name="email"
+            value="{{ email|default:'' }}"
+            placeholder="you@company.com"
+            autocomplete="email"
+            required
+            autofocus
+          >
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="id_password">Password</label>
+          <input
+            class="form-input"
+            type="password"
+            id="id_password"
+            name="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg btn-block">Sign in</button>
+      </form>
+
+      <p class="auth-footer">Access is provisioned by your company's HR admin.</p>
+    </div>
+
+    <a href="{% url 'web-home' %}" class="auth-back-link">← Back to home</a>
+  </div>
+
+</body>
+</html>
