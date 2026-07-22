@@ -1,0 +1,269 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service — {{ nexus_app_name }}</title>
+  <meta name="description" content="Terms of Service governing access to and use of Nexus, the centralized employee data management platform.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/welcome.css' %}">
+  <link rel="stylesheet" href="{% static 'css/legal.css' %}">
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="container">
+      <a href="{% url 'web-home' %}" class="logo">
+        <span class="logo-mark">N</span>
+        <span class="logo-name">Nexus</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="{% url 'web-home' %}#modules">Modules</a></li>
+        <li><a href="{% url 'web-home' %}#industries">Industries</a></li>
+        <li><a href="{% url 'web-home' %}#how-it-works">How it works</a></li>
+      </ul>
+
+      <div class="nav-ctas">
+        {% if user.is_authenticated %}
+          <span class="nav-user">Signed in as <strong>{{ user.email }}</strong></span>
+          <form action="{% url 'web-logout' %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-ghost">Sign out</button>
+          </form>
+        {% else %}
+          <a href="{% url 'web-login' %}" class="btn btn-ghost">Login</a>
+          <a href="{% url 'web-login' %}" class="btn btn-primary">Get Started</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <main>
+
+    <section class="legal-hero">
+      <div class="container">
+        <span class="tag-pill"><span class="tag-pill-dot"></span>Legal</span>
+        <h1>Terms of Service</h1>
+        <p>Last Updated: <span class="legal-placeholder">[Insert Date]</span></p>
+      </div>
+    </section>
+
+    <section class="legal-shell">
+      <div class="container">
+        <div class="legal-layout">
+
+          <aside class="legal-toc">
+            <h4>On this page</h4>
+            <ol>
+              <li><a href="#tos-1">Introduction</a></li>
+              <li><a href="#tos-2">The Service</a></li>
+              <li><a href="#tos-3">Accounts and Access</a></li>
+              <li><a href="#tos-4">Customer Data</a></li>
+              <li><a href="#tos-5">Subscription, Fees, and Payment</a></li>
+              <li><a href="#tos-6">Acceptable Use</a></li>
+              <li><a href="#tos-7">Mobile App Functionality</a></li>
+              <li><a href="#tos-8">Compliance Disclaimers</a></li>
+              <li><a href="#tos-9">Intellectual Property</a></li>
+              <li><a href="#tos-10">Confidentiality</a></li>
+              <li><a href="#tos-11">Term, Suspension, and Termination</a></li>
+              <li><a href="#tos-12">Warranties and Disclaimers</a></li>
+              <li><a href="#tos-13">Limitation of Liability</a></li>
+              <li><a href="#tos-14">Changes to These Terms</a></li>
+              <li><a href="#tos-15">Governing Law</a></li>
+              <li><a href="#tos-16">Contact</a></li>
+            </ol>
+          </aside>
+
+          <article class="legal-content">
+
+            <div class="legal-section" id="tos-1">
+              <h2><span class="legal-section-number">1.</span> Introduction</h2>
+              <p>These Terms of Service ("Terms") govern access to and use of Nexus, a Software-as-a-Service platform providing centralized employee data management, attendance and leave tracking, health-safety-environment ("HSE") and man-hours management, and payroll processing (collectively, the "Service"), provided by <span class="legal-placeholder">CV. Namara Ewa Indonesia</span> ("Nexus," "we," "us," or "our").</p>
+              <p>By registering for, accessing, or using the Service, the company or organization entering into this agreement ("Customer," "you," or "your") agrees to be bound by these Terms. If you are accepting these Terms on behalf of a company, you represent that you have the authority to bind that company.</p>
+              <p>If you do not agree to these Terms, do not access or use the Service.</p>
+            </div>
+
+            <div class="legal-section" id="tos-2">
+              <h2><span class="legal-section-number">2.</span> The Service</h2>
+              <p>Nexus is a multi-tenant, subscription-based platform comprising the following core modules:</p>
+              <ul>
+                <li><strong>Core</strong> — employee master data, departments, positions, document storage, and user authentication</li>
+                <li><strong>Attendance &amp; Leave</strong> — mobile clock-in/clock-out, shift management, and leave requests and approvals</li>
+                <li><strong>HSE &amp; Man-Hours</strong> — safety violation tracking, man-hours aggregation, induction management, work permits, and license tracking</li>
+                <li><strong>Payroll</strong> — payroll calculation, payslip generation, overtime, and statutory deductions (including PPh 21 and BPJS, as applicable in Indonesia)</li>
+              </ul>
+              <p>The Service is accessed via (a) a mobile application ("Mobile App"), used by all personnel — including employees, managers, and administrators — for clock-in/clock-out and self-service functions, and (b) a web dashboard ("Web Dashboard"), used by managers and HR administrators for employee records, payroll processing, HSE oversight, and approval workflows.</p>
+              <p>Nexus may add, modify, or discontinue features of the Service from time to time, provided that no such change materially reduces the core functionality of a subscribed module during an active subscription term without reasonable notice.</p>
+            </div>
+
+            <div class="legal-section" id="tos-3">
+              <h2><span class="legal-section-number">3.</span> Accounts and Access</h2>
+              <ul>
+                <li>Customer is responsible for creating and managing user accounts for its personnel and for ensuring that account credentials are kept confidential.</li>
+                <li>Customer is responsible for all activity that occurs under its accounts, except to the extent caused by Nexus's breach of these Terms.</li>
+                <li>Nexus reserves the right to suspend accounts that show evidence of unauthorized access, fraud, or violation of these Terms.</li>
+                <li>Each company account operates within an isolated tenant environment. Customer data is logically segregated from that of other customers at every layer of the platform.</li>
+              </ul>
+            </div>
+
+            <div class="legal-section" id="tos-4">
+              <h2><span class="legal-section-number">4.</span> Customer Data</h2>
+              <ul>
+                <li>"Customer Data" means all data submitted to or collected through the Service on Customer's behalf, including employee records, attendance logs, GPS and location data, photographs captured for verification purposes, HSE records, and payroll information.</li>
+                <li>Customer retains all ownership rights in Customer Data. Nexus is granted a limited license to host, process, and use Customer Data solely to provide, maintain, secure, and improve the Service.</li>
+                <li>Customer is solely responsible for ensuring it has the necessary legal basis and, where required, employee consent or notice, to collect and process employee data (including location and photographic data) through the Service, in accordance with applicable law.</li>
+                <li>Nexus will implement reasonable administrative, technical, and physical safeguards to protect Customer Data, as further described in the Privacy Policy.</li>
+              </ul>
+            </div>
+
+            <div class="legal-section" id="tos-5">
+              <h2><span class="legal-section-number">5.</span> Subscription, Fees, and Payment</h2>
+              <ul>
+                <li>The Service is offered on a subscription basis, billed according to the number of active employee records under management and the module tiers selected by Customer, as set out in an order form, invoice, or account dashboard.</li>
+                <li>Fees are due in accordance with the agreed billing cycle. Late payments may result in suspension of access after reasonable notice.</li>
+                <li>Except as otherwise agreed in writing or required by law, fees are non-refundable.</li>
+                <li>Nexus reserves the right to modify subscription pricing with prior notice, effective at the start of the next renewal term.</li>
+              </ul>
+            </div>
+
+            <div class="legal-section" id="tos-6">
+              <h2><span class="legal-section-number">6.</span> Acceptable Use</h2>
+              <p>Customer and its authorized users agree not to:</p>
+              <ul>
+                <li>Use the Service to violate any applicable law, including labor, data protection, or tax regulations;</li>
+                <li>Attempt to gain unauthorized access to another tenant's data or to the Service's underlying infrastructure;</li>
+                <li>Reverse engineer, decompile, or attempt to extract the source code of the Service, except as permitted by law;</li>
+                <li>Use the Service to store or transmit malicious code, or to interfere with the integrity or performance of the Service;</li>
+                <li>Falsify attendance, location, HSE, or payroll data, or circumvent fraud-prevention features (e.g., GPS geofencing, photo verification).</li>
+              </ul>
+            </div>
+
+            <div class="legal-section" id="tos-7">
+              <h2><span class="legal-section-number">7.</span> Mobile App Functionality</h2>
+              <ul>
+                <li>Clock-in/clock-out functionality is offered exclusively via the Mobile App and may rely on device location services and camera access to verify attendance.</li>
+                <li>The Mobile App supports offline data capture with automatic synchronization once connectivity is restored. Customer acknowledges that data recorded offline is subject to validation upon sync and may be flagged pending review.</li>
+                <li>Customer is responsible for informing its personnel that location and photographic data will be captured as part of attendance verification.</li>
+              </ul>
+            </div>
+
+            <div class="legal-section" id="tos-8">
+              <h2><span class="legal-section-number">8.</span> Compliance Disclaimers</h2>
+              <ul>
+                <li>Nexus provides configurable tools to support compliance with Indonesian labor regulations (Manpower/Manaker regulations), income tax withholding (PPh 21 under UU HPP No. 7/2021), BPJS Ketenagakerjaan and Kesehatan contributions, and relevant HSE standards (e.g., ISO 45001, OSHA-aligned practices).</li>
+                <li>Nexus does not provide legal, tax, or accounting advice. Customer remains solely responsible for the accuracy of configured rules (e.g., PTKP settings) and for ensuring its use of the Service complies with all applicable laws in its jurisdiction.</li>
+                <li>Statutory rates, thresholds, and calculation rules are updated on a best-efforts basis and may require Customer verification prior to payroll disbursement.</li>
+              </ul>
+            </div>
+
+            <div class="legal-section" id="tos-9">
+              <h2><span class="legal-section-number">9.</span> Intellectual Property</h2>
+              <p>The Service, including its software, design, trademarks, and documentation, is owned by Nexus and its licensors. These Terms grant Customer a limited, non-exclusive, non-transferable right to use the Service during an active subscription. No other rights are granted.</p>
+            </div>
+
+            <div class="legal-section" id="tos-10">
+              <h2><span class="legal-section-number">10.</span> Confidentiality</h2>
+              <p>Each party agrees to protect the other's confidential information disclosed in connection with the Service using at least the same degree of care it uses for its own confidential information, and not to disclose it to third parties except as required to perform under these Terms or by law.</p>
+            </div>
+
+            <div class="legal-section" id="tos-11">
+              <h2><span class="legal-section-number">11.</span> Term, Suspension, and Termination</h2>
+              <ul>
+                <li>These Terms remain in effect for the duration of Customer's active subscription.</li>
+                <li>Nexus may suspend or terminate access for material breach of these Terms, non-payment, or unlawful use, following reasonable notice and opportunity to cure where practicable.</li>
+                <li>Upon termination, Customer may request export of Customer Data within a reasonable period, after which such data may be deleted or anonymized in accordance with Nexus's data retention practices.</li>
+              </ul>
+            </div>
+
+            <div class="legal-section" id="tos-12">
+              <h2><span class="legal-section-number">12.</span> Warranties and Disclaimers</h2>
+              <p>Nexus will use commercially reasonable efforts to provide the Service in a manner consistent with general industry standards. Except as expressly stated, the Service is provided "as is" and "as available," without warranties of any kind, whether express or implied, including merchantability, fitness for a particular purpose, or non-infringement, to the extent permitted by applicable law.</p>
+            </div>
+
+            <div class="legal-section" id="tos-13">
+              <h2><span class="legal-section-number">13.</span> Limitation of Liability</h2>
+              <p>To the maximum extent permitted by law, neither party shall be liable for indirect, incidental, special, or consequential damages arising from these Terms or use of the Service. Each party's aggregate liability shall not exceed the fees paid by Customer in the twelve (12) months preceding the claim, except for liability arising from confidentiality breaches, data protection violations, or willful misconduct.</p>
+            </div>
+
+            <div class="legal-section" id="tos-14">
+              <h2><span class="legal-section-number">14.</span> Changes to These Terms</h2>
+              <p>Nexus may update these Terms from time to time. Material changes will be communicated to Customer with reasonable advance notice. Continued use of the Service after such changes take effect constitutes acceptance of the revised Terms.</p>
+            </div>
+
+            <div class="legal-section" id="tos-15">
+              <h2><span class="legal-section-number">15.</span> Governing Law</h2>
+              <p>These Terms shall be governed by the laws of <span class="legal-placeholder">[Jurisdiction, e.g., the Republic of Indonesia]</span>, without regard to conflict-of-law principles. Any disputes shall be resolved through the courts or arbitration body designated in the applicable order form.</p>
+            </div>
+
+            <div class="legal-section" id="tos-16">
+              <h2><span class="legal-section-number">16.</span> Contact</h2>
+              <p>For questions regarding these Terms, please contact:</p>
+              <address class="legal-contact">
+                <strong><span class="legal-placeholder">CV. Namara Ewa Indonesia</span></strong><br>
+                <span class="legal-placeholder">[Address]</span><br>
+                <span class="legal-placeholder">[Email]</span><br>
+                <span class="legal-placeholder">[Phone]</span>
+              </address>
+            </div>
+
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <div class="logo">
+            <span class="logo-mark">N</span>
+            <span class="logo-name">Nexus</span>
+          </div>
+          <p>One platform for attendance, safety, and payroll — built for manufacturing, construction, mining, and office teams across Indonesia.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="{% url 'web-home' %}#modules">Modules</a></li>
+            <li><a href="{% url 'web-home' %}#industries">Industries</a></li>
+            <li><a href="{% url 'web-home' %}#how-it-works">How it works</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="{% url 'web-login' %}">Login</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="{% url 'web-privacy' %}">Privacy Policy</a></li>
+            <li><a href="{% url 'web-tos' %}">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 CV. Namara Ewa Indonesia. All rights reserved.</span>
+        <span>Made for Indonesian industry.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

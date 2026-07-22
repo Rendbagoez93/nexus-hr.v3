@@ -1,0 +1,242 @@
+/*
+ * legal.css
+ * Layout and typography for long-form legal documents (Terms of Service,
+ * Privacy Policy). Reuses design tokens from tokens.css and shares the
+ * .site-nav / .site-footer / .section-header primitives from welcome.css.
+ */
+
+/* ── Legal hero ───────────────────────────────────────────────────────── */
+.legal-hero {
+  padding: 152px 0 var(--space-2xl);
+  border-bottom: 1px solid var(--color-border);
+  text-align: center;
+}
+
+.legal-hero .tag-pill {
+  margin-bottom: var(--space-md);
+}
+
+.legal-hero h1 {
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  line-height: 1.15;
+  margin-bottom: var(--space-sm);
+}
+
+.legal-hero p {
+  color: var(--color-text-muted);
+  font-size: 15px;
+}
+
+/* ── Layout shell ─────────────────────────────────────────────────────── */
+.legal-shell {
+  padding: var(--space-3xl) 0 var(--space-4xl);
+}
+
+.legal-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: var(--space-2xl);
+  align-items: start;
+}
+
+/* ── Table of contents ────────────────────────────────────────────────── */
+.legal-toc {
+  position: sticky;
+  top: 96px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+}
+
+.legal-toc h4 {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+  margin-bottom: var(--space-md);
+}
+
+.legal-toc ol {
+  counter-reset: legal-toc-counter;
+}
+
+.legal-toc li {
+  counter-increment: legal-toc-counter;
+}
+
+.legal-toc a {
+  display: flex;
+  gap: var(--space-xs);
+  padding: 6px var(--space-sm);
+  margin-left: calc(var(--space-sm) * -1);
+  border-left: 2px solid transparent;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.4;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast), border-color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.legal-toc a::before {
+  content: counter(legal-toc-counter) ".";
+  color: var(--color-text-subtle);
+  flex-shrink: 0;
+}
+
+.legal-toc a:hover {
+  color: var(--color-text);
+  background: rgba(59, 130, 246, 0.08);
+  border-left-color: var(--color-primary);
+}
+
+/* ── Content card ─────────────────────────────────────────────────────── */
+.legal-content {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+}
+
+.legal-section {
+  scroll-margin-top: 96px;
+  padding-bottom: var(--space-2xl);
+  margin-bottom: var(--space-2xl);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.legal-section:last-child {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.legal-section h2 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-xs);
+}
+
+.legal-section-number {
+  color: var(--color-primary-lt);
+}
+
+.legal-section p {
+  color: var(--color-text-muted);
+  line-height: 1.75;
+  margin-bottom: var(--space-md);
+}
+
+.legal-section p:last-child {
+  margin-bottom: 0;
+}
+
+.legal-section ul,
+.legal-section ol {
+  margin: 0 0 var(--space-md);
+  padding-left: var(--space-lg);
+}
+
+.legal-section ul li {
+  list-style: disc;
+}
+
+.legal-section ol li {
+  list-style: decimal;
+}
+
+.legal-section li {
+  color: var(--color-text-muted);
+  line-height: 1.75;
+  margin-bottom: var(--space-xs);
+}
+
+.legal-section li:last-child {
+  margin-bottom: 0;
+}
+
+.legal-section strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* ── Data table (Privacy Policy §3) ──────────────────────────────────── */
+.legal-table-wrap {
+  overflow-x: auto;
+  margin-bottom: var(--space-md);
+}
+
+.legal-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.legal-table th,
+.legal-table td {
+  border: 1px solid var(--color-border);
+  padding: var(--space-sm) var(--space-md);
+  text-align: left;
+  vertical-align: top;
+}
+
+.legal-table th {
+  background: var(--color-bg-card-2);
+  color: var(--color-text);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.legal-table td {
+  color: var(--color-text-muted);
+}
+
+/* ── Placeholder markers ─────────────────────────────────────────────── */
+.legal-placeholder {
+  color: var(--color-warning);
+  border-bottom: 1px dashed rgba(245, 158, 11, 0.5);
+}
+
+/* ── Contact block ────────────────────────────────────────────────────── */
+.legal-contact {
+  background: var(--color-bg-card-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  font-style: normal;
+  color: var(--color-text-muted);
+  line-height: 1.9;
+}
+
+.legal-contact strong {
+  color: var(--color-text);
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 960px) {
+  .legal-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .legal-toc {
+    position: static;
+  }
+}
+
+@media (max-width: 480px) {
+  .legal-hero {
+    padding-top: 128px;
+  }
+
+  .legal-content {
+    padding: var(--space-lg);
+  }
+}

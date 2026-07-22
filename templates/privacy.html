@@ -1,0 +1,310 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — {{ nexus_app_name }}</title>
+  <meta name="description" content="Privacy Policy explaining how Nexus collects, uses, stores, and protects personal data on behalf of Customer companies.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/welcome.css' %}">
+  <link rel="stylesheet" href="{% static 'css/legal.css' %}">
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="container">
+      <a href="{% url 'web-home' %}" class="logo">
+        <span class="logo-mark">N</span>
+        <span class="logo-name">Nexus</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="{% url 'web-home' %}#modules">Modules</a></li>
+        <li><a href="{% url 'web-home' %}#industries">Industries</a></li>
+        <li><a href="{% url 'web-home' %}#how-it-works">How it works</a></li>
+      </ul>
+
+      <div class="nav-ctas">
+        {% if user.is_authenticated %}
+          <span class="nav-user">Signed in as <strong>{{ user.email }}</strong></span>
+          <form action="{% url 'web-logout' %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-ghost">Sign out</button>
+          </form>
+        {% else %}
+          <a href="{% url 'web-login' %}" class="btn btn-ghost">Login</a>
+          <a href="{% url 'web-login' %}" class="btn btn-primary">Get Started</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <main>
+
+    <section class="legal-hero">
+      <div class="container">
+        <span class="tag-pill"><span class="tag-pill-dot"></span>Legal</span>
+        <h1>Privacy Policy</h1>
+        <p>Last Updated: <span class="legal-placeholder">[Insert Date]</span></p>
+      </div>
+    </section>
+
+    <section class="legal-shell">
+      <div class="container">
+        <div class="legal-layout">
+
+          <aside class="legal-toc">
+            <h4>On this page</h4>
+            <ol>
+              <li><a href="#privacy-1">Overview</a></li>
+              <li><a href="#privacy-2">Scope</a></li>
+              <li><a href="#privacy-3">Categories of Personal Data Collected</a></li>
+              <li><a href="#privacy-4">How Personal Data Is Collected</a></li>
+              <li><a href="#privacy-5">Purposes of Processing</a></li>
+              <li><a href="#privacy-6">Legal Basis for Processing</a></li>
+              <li><a href="#privacy-7">Data Sharing and Disclosure</a></li>
+              <li><a href="#privacy-8">Data Security</a></li>
+              <li><a href="#privacy-9">Data Retention</a></li>
+              <li><a href="#privacy-10">International Data Transfers</a></li>
+              <li><a href="#privacy-11">Employee Rights</a></li>
+              <li><a href="#privacy-12">Children's Data</a></li>
+              <li><a href="#privacy-13">Cookies and Tracking (Web Dashboard)</a></li>
+              <li><a href="#privacy-14">Changes to This Policy</a></li>
+              <li><a href="#privacy-15">Contact Us</a></li>
+            </ol>
+          </aside>
+
+          <article class="legal-content">
+
+            <div class="legal-section" id="privacy-1">
+              <h2><span class="legal-section-number">1.</span> Overview</h2>
+              <p>This Privacy Policy explains how <span class="legal-placeholder">CV. Namara Ewa Indonesia</span> ("Nexus," "we," "us," or "our") collects, uses, stores, and protects personal data through the Nexus platform (the "Service"), used by companies ("Customer") to manage employee data across attendance, leave, health-safety-environment (HSE), and payroll functions.</p>
+              <p>Nexus acts primarily as a <strong>data processor</strong> on behalf of Customer, who acts as the <strong>data controller</strong> for its employees' personal data. This Policy is intended to be read alongside Customer's own internal privacy notices provided to its employees.</p>
+            </div>
+
+            <div class="legal-section" id="privacy-2">
+              <h2><span class="legal-section-number">2.</span> Scope</h2>
+              <p>This Policy applies to personal data processed through:</p>
+              <ul>
+                <li>The <strong>Mobile App</strong>, used by employees, managers, and administrators for clock-in/clock-out and self-service functions</li>
+                <li>The <strong>Web Dashboard</strong>, used by managers and HR administrators for employee records, payroll, HSE oversight, and approvals</li>
+              </ul>
+            </div>
+
+            <div class="legal-section" id="privacy-3">
+              <h2><span class="legal-section-number">3.</span> Categories of Personal Data Collected</h2>
+              <p>Depending on the modules subscribed to by Customer, the Service may process:</p>
+              <div class="legal-table-wrap">
+                <table class="legal-table">
+                  <thead>
+                    <tr>
+                      <th>Category</th>
+                      <th>Examples</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Identity &amp; Employment Data</strong></td>
+                      <td>Name, employee ID, department, position, employment status, contact details</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Authentication Data</strong></td>
+                      <td>Login credentials, user roles, access logs</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Attendance &amp; Location Data</strong></td>
+                      <td>Clock-in/clock-out timestamps, GPS coordinates, geofence validation results</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Photographic Data</strong></td>
+                      <td>Photos captured during clock-in/clock-out for identity verification</td>
+                    </tr>
+                    <tr>
+                      <td><strong>HSE Data</strong></td>
+                      <td>Safety violation reports, photo evidence, induction records, work permit details, license and certification data</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Payroll &amp; Tax Data</strong></td>
+                      <td>Salary, overtime, PPh 21 tax computations, BPJS Ketenagakerjaan/Kesehatan contributions, bank account details for disbursement</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Documents</strong></td>
+                      <td>Employee-uploaded or HR-uploaded documents (e.g., contracts, IDs, certifications)</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Device &amp; Usage Data</strong></td>
+                      <td>Device identifiers, app version, offline sync logs, general usage analytics</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="legal-section" id="privacy-4">
+              <h2><span class="legal-section-number">4.</span> How Personal Data Is Collected</h2>
+              <ul>
+                <li><strong>Directly from employees</strong>, via the Mobile App (e.g., clock-in photos, leave requests) or Web Dashboard (e.g., self-service profile updates).</li>
+                <li><strong>From Customer's HR/administrative personnel</strong>, who input or upload employee master data, payroll configurations, and HSE records.</li>
+                <li><strong>Automatically</strong>, through device sensors (GPS) and system logs, for fraud prevention and audit purposes (e.g., geofencing validation, offline/online sync detection).</li>
+              </ul>
+            </div>
+
+            <div class="legal-section" id="privacy-5">
+              <h2><span class="legal-section-number">5.</span> Purposes of Processing</h2>
+              <p>Personal data is processed to:</p>
+              <ol>
+                <li>Provide core HR functionality — employee records, department/position management, and document storage</li>
+                <li>Enable attendance and leave tracking, including shift management and approval workflows</li>
+                <li>Verify attendance authenticity through GPS geofencing and photo confirmation, and detect fraudulent clock-ins</li>
+                <li>Support HSE compliance — man-hours aggregation, violation tracking, induction/license validity checks, and work permit management</li>
+                <li>Calculate and generate payroll, including statutory tax and social security deductions applicable in Indonesia</li>
+                <li>Maintain audit trails to support regulatory compliance and internal investigations</li>
+                <li>Maintain the security, availability, and integrity of the Service</li>
+                <li>Comply with applicable legal and regulatory obligations</li>
+              </ol>
+            </div>
+
+            <div class="legal-section" id="privacy-6">
+              <h2><span class="legal-section-number">6.</span> Legal Basis for Processing</h2>
+              <p>Where applicable data protection law requires a legal basis (including Indonesia's Personal Data Protection Law, UU No. 27/2021), processing is generally based on:</p>
+              <ul>
+                <li>Performance of the employment relationship or contract between Customer and its employees</li>
+                <li>Customer's legitimate interests in workforce management, safety, and fraud prevention</li>
+                <li>Compliance with legal obligations (e.g., tax withholding, social security contributions, occupational safety recordkeeping)</li>
+                <li>Consent, where required — for example, for location or photographic data capture, which Customer is responsible for obtaining and documenting from its employees prior to enabling these features</li>
+              </ul>
+            </div>
+
+            <div class="legal-section" id="privacy-7">
+              <h2><span class="legal-section-number">7.</span> Data Sharing and Disclosure</h2>
+              <p>Nexus does not sell personal data. Personal data may be shared with:</p>
+              <ul>
+                <li><strong>Customer's authorized personnel</strong> (e.g., HR administrators, managers), according to role-based access controls configured within the tenant</li>
+                <li><strong>Sub-processors</strong> engaged to support infrastructure, hosting, or specific functions (e.g., cloud hosting providers), under contractual confidentiality and data protection obligations</li>
+                <li><strong>Government or regulatory bodies</strong>, where required for tax reporting, social security administration (BPJS), or labor law compliance</li>
+                <li><strong>Professional advisors or authorities</strong>, where necessary to establish, exercise, or defend legal claims, or as required by law</li>
+              </ul>
+              <p>Each Customer's data is logically isolated within its own tenant environment and is not accessible to other customers.</p>
+            </div>
+
+            <div class="legal-section" id="privacy-8">
+              <h2><span class="legal-section-number">8.</span> Data Security</h2>
+              <p>Nexus implements administrative, technical, and physical safeguards appropriate to the sensitivity of the data processed, including:</p>
+              <ul>
+                <li>Tenant-scoped access controls and data isolation at every application layer</li>
+                <li>Encryption of data in transit and, where applicable, at rest</li>
+                <li>Role-based access permissions on the Web Dashboard</li>
+                <li>Immutable audit logging for attendance, HSE, and payroll-related actions</li>
+                <li>Secure authentication mechanisms for both Mobile App and Web Dashboard access</li>
+              </ul>
+              <p>No system can guarantee absolute security; Nexus will notify Customer without undue delay in the event of a data breach affecting Customer Data, in accordance with applicable law.</p>
+            </div>
+
+            <div class="legal-section" id="privacy-9">
+              <h2><span class="legal-section-number">9.</span> Data Retention</h2>
+              <p>Personal data is retained for as long as necessary to fulfill the purposes described in this Policy, including:</p>
+              <ul>
+                <li>The duration of the employment relationship, as configured by Customer</li>
+                <li>Statutory retention periods required for tax, payroll, and HSE recordkeeping under applicable Indonesian regulations</li>
+                <li>A reasonable period following contract termination to allow for data export, dispute resolution, or legal compliance, after which data is deleted or anonymized</li>
+              </ul>
+              <p>Specific retention periods may be configured by Customer within permitted legal limits.</p>
+            </div>
+
+            <div class="legal-section" id="privacy-10">
+              <h2><span class="legal-section-number">10.</span> International Data Transfers</h2>
+              <p>Where personal data is transferred outside Indonesia (e.g., to a cloud hosting region), Nexus will implement appropriate safeguards consistent with applicable data protection law, such as contractual protections with sub-processors.</p>
+            </div>
+
+            <div class="legal-section" id="privacy-11">
+              <h2><span class="legal-section-number">11.</span> Employee Rights</h2>
+              <p>Depending on applicable law, employees may have rights to access, correct, or request deletion of their personal data, and to object to certain processing (e.g., location tracking). Because Customer is the data controller, employee requests should generally be directed to their employer (Customer). Nexus will support Customer in fulfilling such requests where the data is held within the Service.</p>
+            </div>
+
+            <div class="legal-section" id="privacy-12">
+              <h2><span class="legal-section-number">12.</span> Children's Data</h2>
+              <p>The Service is intended for use by employed adults and is not directed at children. Nexus does not knowingly collect personal data from individuals under the legal working age.</p>
+            </div>
+
+            <div class="legal-section" id="privacy-13">
+              <h2><span class="legal-section-number">13.</span> Cookies and Tracking (Web Dashboard)</h2>
+              <p>The Web Dashboard may use cookies or similar technologies for authentication, session management, and basic usage analytics. These are not used for third-party advertising purposes.</p>
+            </div>
+
+            <div class="legal-section" id="privacy-14">
+              <h2><span class="legal-section-number">14.</span> Changes to This Policy</h2>
+              <p>This Privacy Policy may be updated periodically to reflect changes in the Service or applicable law. Material changes will be communicated to Customer with reasonable advance notice. The "Last Updated" date at the top of this Policy reflects the most recent revision.</p>
+            </div>
+
+            <div class="legal-section" id="privacy-15">
+              <h2><span class="legal-section-number">15.</span> Contact Us</h2>
+              <p>For questions about this Privacy Policy or to make a data protection request, please contact:</p>
+              <address class="legal-contact">
+                <strong><span class="legal-placeholder">CV. Namara Ewa Indonesia</span></strong><br>
+                Data Protection Contact: <span class="legal-placeholder">[Name/Role]</span><br>
+                <span class="legal-placeholder">[Address]</span><br>
+                <span class="legal-placeholder">[Email]</span><br>
+                <span class="legal-placeholder">[Phone]</span>
+              </address>
+            </div>
+
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <div class="logo">
+            <span class="logo-mark">N</span>
+            <span class="logo-name">Nexus</span>
+          </div>
+          <p>One platform for attendance, safety, and payroll — built for manufacturing, construction, mining, and office teams across Indonesia.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="{% url 'web-home' %}#modules">Modules</a></li>
+            <li><a href="{% url 'web-home' %}#industries">Industries</a></li>
+            <li><a href="{% url 'web-home' %}#how-it-works">How it works</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="{% url 'web-login' %}">Login</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="{% url 'web-privacy' %}">Privacy Policy</a></li>
+            <li><a href="{% url 'web-tos' %}">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 CV. Namara Ewa Indonesia. All rights reserved.</span>
+        <span>Made for Indonesian industry.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

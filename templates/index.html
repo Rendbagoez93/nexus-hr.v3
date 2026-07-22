@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ nexus_app_name }} — Centralized Employee Data Management</title>
-  <meta name="description" content="Nexus is a centralized employee data management platform for manufacturing, construction, mining, and office industries in Indonesia.">
+  <meta name="description" content="Nexus unifies attendance, safety, and payroll for manufacturing, construction, mining, and office teams — built around a single source of truth: your employee data.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -59,17 +59,15 @@
     <section class="hero">
       <div class="container">
         <div class="hero-copy">
-          <span class="tag-pill"><span class="tag-pill-dot"></span> Centralized HR Platform</span>
-          <h1>One source of truth for your entire workforce.</h1>
+          <h1>One platform. Every employee. Zero guesswork.</h1>
           <p>
-            Nexus centralizes employee data, attendance, HSE compliance, and
-            payroll for manufacturing, construction, mining, and office
-            companies across Indonesia — built around a single Employee
-            record that every module shares.
+            Nexus unifies attendance, safety, and payroll for manufacturing,
+            construction, mining, and office teams — built around a single
+            source of truth: your employee data.
           </p>
           <div class="hero-actions">
             <a href="{% url 'web-login' %}" class="btn btn-primary btn-xl">Get Started</a>
-            <a href="#modules" class="btn btn-outline btn-xl">See how it works</a>
+            <a href="#modules" class="btn btn-outline btn-xl">See How It Works</a>
           </div>
         </div>
 
@@ -133,9 +131,8 @@
     <section class="section" id="modules">
       <div class="container">
         <div class="section-header reveal">
-          <span class="tag-pill">Platform Modules</span>
           <h2>Four modules. One employee record.</h2>
-          <p>Start with Core, then add the modules your company needs — every module reads from the same Employee master data.</p>
+          <p>Every module references a single Employee entity — no duplicate data, no sync errors, no more guessing which system is right.</p>
         </div>
 
         <div class="feature-grid">
@@ -153,9 +150,9 @@
           <div class="card reveal reveal-delay-1">
             <div class="card-icon icon-cyan">🕒</div>
             <h3>Attendance &amp; Leave</h3>
-            <p>Mobile clock-in/out with GPS and photo, shift schedules, and leave approvals.</p>
+            <p>Mobile clock-in/out with GPS and photo verification, shift management, and leave requests and approvals.</p>
             <ul class="card-list">
-              <li>Geofenced mobile clock-in/out</li>
+              <li>Fraud-resistant clock-in with GPS geofencing and photo verification</li>
               <li>Shift-aware live status</li>
               <li>Leave requests and balances</li>
             </ul>
@@ -164,7 +161,7 @@
           <div class="card reveal reveal-delay-2">
             <div class="card-icon icon-amber">🦺</div>
             <h3>HSE + Man Hours</h3>
-            <p>Violations, man-hour aggregation, inductions, and work permit tracking.</p>
+            <p>Safety violations with photo evidence, man-hour aggregation, inductions, and multi-step work permit tracking.</p>
             <ul class="card-list">
               <li>Induction and licence expiry alerts</li>
               <li>Man-hour reporting</li>
@@ -175,7 +172,7 @@
           <div class="card reveal reveal-delay-3">
             <div class="card-icon icon-green">💰</div>
             <h3>Payroll</h3>
-            <p>Payroll runs, payslips, overtime, PPh 21, and BPJS calculations.</p>
+            <p>Payroll calculation, payslip generation, overtime, PPh 21, and BPJS deductions — calculated correctly, every cycle.</p>
             <ul class="card-list">
               <li>Indonesian tax &amp; BPJS compliance</li>
               <li>Overtime and payslip history</li>
@@ -212,7 +209,6 @@
     <section class="section" id="how-it-works">
       <div class="container">
         <div class="section-header reveal">
-          <span class="tag-pill">How it works</span>
           <h2>Up and running in three steps.</h2>
           <p>Nexus is built to onboard a company and its full workforce without a lengthy implementation cycle.</p>
         </div>
@@ -240,7 +236,7 @@
     <section class="section cta-band">
       <div class="container">
         <h2>Ready to centralize your HR data?</h2>
-        <p>Sign in to your Nexus account to manage your workforce, or get in touch to set up a new company.</p>
+        <p>One platform for operational efficiency, safety compliance, and employee self-service — less administrative overhead, more workforce visibility.</p>
         <a href="{% url 'web-login' %}" class="btn btn-primary btn-xl">Get Started</a>
       </div>
     </section>
@@ -255,7 +251,7 @@
             <span class="logo-mark">N</span>
             <span class="logo-name">Nexus</span>
           </div>
-          <p>Centralized Employee Data Management for manufacturing, construction, mining, and office industries in Indonesia.</p>
+          <p>One platform for attendance, safety, and payroll — built for manufacturing, construction, mining, and office teams across Indonesia.</p>
         </div>
 
         <div class="footer-col">
@@ -277,14 +273,14 @@
         <div class="footer-col">
           <h4>Legal</h4>
           <ul>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms of Service</a></li>
+            <li><a href="{% url 'web-privacy' %}">Privacy Policy</a></li>
+            <li><a href="{% url 'web-tos' %}">Terms of Service</a></li>
           </ul>
         </div>
       </div>
 
       <div class="footer-bottom">
-        <span>© 2026 Nexus HR. All rights reserved.</span>
+        <span>© 2026 CV. Namara Ewa Indonesia. All rights reserved.</span>
         <span>Made for Indonesian industry.</span>
       </div>
     </div>
