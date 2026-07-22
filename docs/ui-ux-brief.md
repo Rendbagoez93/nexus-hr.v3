@@ -72,7 +72,7 @@ Alternate sections by zebra-striping between `--color-bg` and `--color-bg-card-2
 
 Single border token: `--color-border` (`#1f2d47`). Active borders: `rgba(59,130,246,0.4)`.
 
-### Status Badge Colors
+### Status Colors
 
 | Status | Background | Text |
 |--------|-----------|------|
@@ -106,7 +106,7 @@ Six tints at 12% opacity for `52×52px` icon containers: `icon-blue`, `icon-cyan
 | Body | `15px` | 400 | none | 1.65 |
 | Small body | `14px` | 400–500 | none | 1.4–1.65 |
 | Label / meta | `13px` | 500–600 | none | default |
-| Badge / tag | `10px–12px` | 600 | `0.05em` | default |
+| Tag pill | `10px–12px` | 600 | `0.05em` | default |
 | ALL-CAPS label | `11px–13px` | 600–700 | `0.04–0.05em` | default |
 
 ### Typography Rules
@@ -126,7 +126,7 @@ Six tints at 12% opacity for `52×52px` icon containers: `icon-blue`, `icon-cyan
 |------|-------|-----|
 | 2xs | 4px | Tag internal padding (vertical) |
 | xs | 6–8px | Gap between inline elements, icon margins |
-| sm | 10–12px | Button padding (vertical), badge padding |
+| sm | 10–12px | Button padding (vertical) |
 | md | 14–16px | Card internal padding (tight) |
 | base | 20–24px | Card padding (standard), container horizontal padding |
 | lg | 28–32px | Card padding (generous), step card padding |
@@ -251,16 +251,10 @@ Hover rules:
 
 Hover: gradient visible + border turns blue + `translateY(-4px)` + blue shadow. All four fire together.
 
-### Status Badges
-
-- `border-radius: 999px` (fully rounded)
-- Font: 600 weight, 10–12px size
-- Always use semantic color pairs — never custom one-offs
-
 ### Data List Rows
 
 - Initials avatar: brand gradient background, `#fff` text, `700` weight
-- Name, status badge layout
+- Name, status label layout
 
 ### Stat Cards
 
@@ -270,7 +264,7 @@ Hover: gradient visible + border turns blue + `translateY(-4px)` + blue shadow. 
 
 ### Step / Process Cards
 
-- Numbered circular badge with primary tint
+- Numbered circular indicator with primary tint
 - `→` connector between cards (hidden on mobile)
 
 ### Floating Cards
@@ -336,7 +330,7 @@ left                  center         right
 - `.reveal`: `opacity: 0; translateY(24px)` → `.visible`: `opacity: 1; translateY(0)`
 - Duration: 0.6s ease
 - Stagger: `.reveal-delay-1` through `.reveal-delay-4` (0.1s–0.4s)
-- Applied to: section headers, cards, compliance badges, stat cards
+- Applied to: section headers, cards, compliance indicators, stat cards
 - NOT applied to: nav, hero headline, footer
 
 ### Float Animation
@@ -409,7 +403,7 @@ Never `linear` for UI. Never `ease-in` for reveals.
 | Section titles | Sentence case: "Everything HR, in one platform" |
 | Proper nouns | Retain casing: "PPh 21", "BPJS Kesehatan", "ISO 45001" |
 | Tag pills / column headers | ALL-CAPS: "CORE MODULES" |
-| Status badges | Title Case: "Clocked In", "On Leave" |
+| Status labels | Title Case: "Clocked In", "On Leave" |
 | Nav links | Title Case: "Features", "How It Works" |
 | CTAs | Active verb + noun: "Explore Features", "Get Started" |
 | Numbers | Comma separator: "1,200 employees" |

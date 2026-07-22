@@ -1,0 +1,558 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — {{ nexus_app_name }}</title>
+  <meta name="description" content="Nexus dashboard — operational command center for employees, attendance, HSE, and payroll.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+<body class="dashboard-body">
+
+  <div class="app-shell">
+
+    <!-- ── Sidebar ─────────────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
+      <div class="sidebar-header">
+        <a href="{% url 'web-dashboard' %}" class="logo">
+          <span class="logo-mark">N</span>
+          <span class="logo-name">Nexus</span>
+        </a>
+        <button
+          type="button"
+          class="sidebar-toggle"
+          id="sidebar-toggle"
+          aria-label="Collapse sidebar"
+          aria-expanded="true"
+          aria-controls="sidebar"
+        >
+          <span class="sidebar-toggle-icon" aria-hidden="true">‹</span>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+
+        <div class="sidebar-section">
+          <h4 class="sidebar-section-title">Core</h4>
+          <ul>
+            <li>
+              <a
+                href="#"
+                class="sidebar-link is-active"
+                data-tab-target="tab-overview"
+              >
+                <span class="sidebar-link-icon" aria-hidden="true">⌂</span>
+                <span class="sidebar-link-label">Overview</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                class="sidebar-link"
+                data-tab-target="tab-employees"
+              >
+                <span class="sidebar-link-icon" aria-hidden="true">👥</span>
+                <span class="sidebar-link-label">Employees</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                class="sidebar-link"
+                data-tab-target="tab-departments"
+              >
+                <span class="sidebar-link-icon" aria-hidden="true">🏢</span>
+                <span class="sidebar-link-label">Departments</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                class="sidebar-link"
+                data-tab-target="tab-documents"
+              >
+                <span class="sidebar-link-icon" aria-hidden="true">📄</span>
+                <span class="sidebar-link-label">Documents</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="sidebar-section">
+          <h4 class="sidebar-section-title">Modules</h4>
+          <ul>
+            <li>
+              <a
+                href="#"
+                class="sidebar-link"
+                data-tab-target="tab-attendance"
+              >
+                <span class="sidebar-link-icon" aria-hidden="true">🕒</span>
+                <span class="sidebar-link-label">Attendance</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                class="sidebar-link"
+                data-tab-target="tab-hse"
+              >
+                <span class="sidebar-link-icon" aria-hidden="true">🦺</span>
+                <span class="sidebar-link-label">HSE + Man Hours</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                class="sidebar-link"
+                data-tab-target="tab-payroll"
+              >
+                <span class="sidebar-link-icon" aria-hidden="true">💰</span>
+                <span class="sidebar-link-label">Payroll</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="sidebar-footer-meta">Nexus.{{ tenant_name }}</span>
+      </div>
+    </aside>
+
+    <!-- ── Main column ─────────────────────────────────────────────────── -->
+    <div class="main-column">
+
+      <!-- TopBar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button
+            type="button"
+            class="topbar-menu"
+            id="topbar-menu"
+            aria-label="Toggle sidebar"
+          >
+            <span aria-hidden="true">☰</span>
+          </button>
+          <div class="topbar-tenant">
+            <span class="topbar-tenant-label">Tenant</span>
+            <span class="topbar-tenant-name">{{ tenant_name }}</span>
+          </div>
+        </div>
+
+        <div class="topbar-center">
+          <label class="topbar-search" for="topbar-search">
+            <span class="topbar-search-icon" aria-hidden="true">🔍</span>
+            <input
+              type="search"
+              id="topbar-search"
+              placeholder="Search employees, departments…"
+              aria-label="Global search"
+              disabled
+            >
+            <kbd class="topbar-search-kbd">⌘K</kbd>
+          </label>
+        </div>
+          <div class="topbar-user">
+            <div class="topbar-user-avatar" aria-hidden="true">
+              {{ user.email|slice:":1"|upper }}
+            </div>
+            <div class="topbar-user-meta">
+              <span class="topbar-user-name">{{ user.email }}</span>
+              <span class="topbar-user-role">{{ user.get_role_display }}</span>
+            </div>
+            <form
+              action="{% url 'web-logout' %}"
+              method="post"
+              class="topbar-logout"
+            >
+              {% csrf_token %}
+              <button
+                type="submit"
+                class="btn btn-ghost btn-sm"
+                aria-label="Sign out"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
+      </header>
+
+      <!-- Page header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-header-title">Dashboard</h1>
+          <p class="page-header-sub">
+            Operational view across {{ tenant_name }} —
+            employee records, attendance, HSE, and payroll.
+          </p>
+        </div>
+      </div>
+
+      <!-- Tab bar -->
+      <div class="tab-bar" role="tablist" aria-label="Module tabs">
+        <button
+          type="button"
+          role="tab"
+          id="tab-btn-overview"
+          aria-controls="tab-overview"
+          aria-selected="true"
+          class="tab-btn is-active"
+          data-tab-id="tab-overview"
+        >
+          Overview
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="tab-btn-employees"
+          aria-controls="tab-employees"
+          aria-selected="false"
+          class="tab-btn"
+          data-tab-id="tab-employees"
+          tabindex="-1"
+        >
+          Employees
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="tab-btn-departments"
+          aria-controls="tab-departments"
+          aria-selected="false"
+          class="tab-btn"
+          data-tab-id="tab-departments"
+          tabindex="-1"
+        >
+          Departments
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="tab-btn-documents"
+          aria-controls="tab-documents"
+          aria-selected="false"
+          class="tab-btn"
+          data-tab-id="tab-documents"
+          tabindex="-1"
+        >
+          Documents
+        </button>
+        <span class="tab-bar-divider" aria-hidden="true"></span>
+        <button
+          type="button"
+          role="tab"
+          id="tab-btn-attendance"
+          aria-controls="tab-attendance"
+          aria-selected="false"
+          class="tab-btn tab-btn-addon"
+          data-tab-id="tab-attendance"
+          tabindex="-1"
+        >
+          Attendance
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="tab-btn-hse"
+          aria-controls="tab-hse"
+          aria-selected="false"
+          class="tab-btn tab-btn-addon"
+          data-tab-id="tab-hse"
+          tabindex="-1"
+        >
+          HSE + Man Hours
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="tab-btn-payroll"
+          aria-controls="tab-payroll"
+          aria-selected="false"
+          class="tab-btn tab-btn-addon"
+          data-tab-id="tab-payroll"
+          tabindex="-1"
+        >
+          Payroll
+        </button>
+      </div>
+
+      <!-- Tab panels -->
+      <main class="tab-panels">
+
+        <!-- Overview tab -->
+        <section
+          class="tab-panel is-active"
+          id="tab-overview"
+          role="tabpanel"
+          aria-labelledby="tab-btn-overview"
+        >
+          <div class="tab-panel-body">
+
+            {% if messages %}
+              <div class="dashboard-messages">
+                {% for message in messages %}
+                  <div class="alert {% if message.tags == 'error' %}alert-error{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %}">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <div class="stat-grid">
+              <div class="stat-card reveal">
+                <div class="stat-card-label">Active Employees</div>
+                <div class="stat-card-value">—</div>
+                <div class="stat-card-meta">Total under {{ tenant_name }}</div>
+              </div>
+              <div class="stat-card reveal reveal-delay-1">
+                <div class="stat-card-label">On Shift</div>
+                <div class="stat-card-value">—</div>
+                <div class="stat-card-meta">Requires Attendance module</div>
+              </div>
+              <div class="stat-card reveal reveal-delay-2">
+                <div class="stat-card-label">Open HSE Violations</div>
+                <div class="stat-card-value">—</div>
+                <div class="stat-card-meta">Requires HSE module</div>
+              </div>
+              <div class="stat-card reveal reveal-delay-3">
+                <div class="stat-card-label">Payroll Run</div>
+                <div class="stat-card-value">—</div>
+                <div class="stat-card-meta">Requires Payroll module</div>
+              </div>
+            </div>
+
+            <div class="dashboard-grid">
+              <article class="dashboard-card reveal">
+                <header class="dashboard-card-header">
+                  <h3>Pending Approvals</h3>
+                </header>
+                <ul class="dashboard-list">
+                  <li class="dashboard-list-item">
+                    <span class="dashboard-list-bullet dashboard-list-bullet-info" aria-hidden="true"></span>
+                    <div>
+                      <div class="dashboard-list-title">Pending leave requests</div>
+                      <div class="dashboard-list-sub">Surface once the Attendance module is wired.</div>
+                    </div>
+                  </li>
+                  <li class="dashboard-list-item">
+                    <span class="dashboard-list-bullet dashboard-list-bullet-warning" aria-hidden="true"></span>
+                    <div>
+                      <div class="dashboard-list-title">Expiring inductions</div>
+                      <div class="dashboard-list-sub">Surface once the HSE module is wired.</div>
+                    </div>
+                  </li>
+                  <li class="dashboard-list-item">
+                    <span class="dashboard-list-bullet dashboard-list-bullet-success" aria-hidden="true"></span>
+                    <div>
+                      <div class="dashboard-list-title">Document verifications</div>
+                      <div class="dashboard-list-sub">HR-admin review queue — handled in the Documents tab.</div>
+                    </div>
+                  </li>
+                </ul>
+              </article>
+
+              <article class="dashboard-card reveal reveal-delay-1">
+                <header class="dashboard-card-header">
+                  <h3>Feeds</h3>
+                </header>
+                <ul class="dashboard-list">
+                  <li class="dashboard-list-item">
+                    <span class="dashboard-list-bullet dashboard-list-bullet-info" aria-hidden="true"></span>
+                    <div>
+                      <div class="dashboard-list-title">Audit log is online</div>
+                      <div class="dashboard-list-sub">Create, update, and deactivate events are recorded.</div>
+                    </div>
+                  </li>
+                  <li class="dashboard-list-item">
+                    <span class="dashboard-list-bullet dashboard-list-bullet-subtle" aria-hidden="true"></span>
+                    <div>
+                      <div class="dashboard-list-title">Module activations will appear here</div>
+                      <div class="dashboard-list-sub">Attendance, HSE, and Payroll events will land on this feed.</div>
+                    </div>
+                  </li>
+                </ul>
+              </article>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Employees tab -->
+        <section
+          class="tab-panel"
+          id="tab-employees"
+          role="tabpanel"
+          aria-labelledby="tab-btn-employees"
+          hidden
+        >
+          <div class="tab-panel-body">
+            <div class="module-placeholder">
+              <h2>Employees</h2>
+              <p>
+                Manage the workforce master record — the single source of truth
+                every other module hangs off of.
+              </p>
+              <ul class="module-placeholder-list">
+                <li>Site Roster table with density toggle</li>
+                <li>Slide-over employee drawer with profile, documents, audit</li>
+                <li>Multi-step New Employee wizard</li>
+              </ul>
+              <p class="module-placeholder-meta">
+                Available with the Core module · UI surfaces here in a follow-up build.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Departments tab -->
+        <section
+          class="tab-panel"
+          id="tab-departments"
+          role="tabpanel"
+          aria-labelledby="tab-btn-departments"
+          hidden
+        >
+          <div class="tab-panel-body">
+            <div class="module-placeholder">
+              <h2>Departments</h2>
+              <p>
+                Org structure — self-referencing departments and positions,
+                with employees per node.
+              </p>
+              <ul class="module-placeholder-list">
+                <li>Tree view of departments with parent/child hierarchy</li>
+                <li>Position list per department with salary bands</li>
+                <li>Inline employee counts</li>
+              </ul>
+              <p class="module-placeholder-meta">
+                Available with the Core module · UI surfaces here in a follow-up build.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Documents tab -->
+        <section
+          class="tab-panel"
+          id="tab-documents"
+          role="tabpanel"
+          aria-labelledby="tab-btn-documents"
+          hidden
+        >
+          <div class="tab-panel-body">
+            <div class="module-placeholder">
+              <h2>Documents</h2>
+              <p>
+                Identity and compliance documents per employee — KTP, NPWP,
+                contracts, ijazah, SIM, sertifikat — served via signed URLs.
+              </p>
+              <ul class="module-placeholder-list">
+                <li>Per-employee document drawer tab</li>
+                <li>Expiry countdown with semantic colour bands</li>
+                <li>Verify / unverify workflow for HR admins</li>
+              </ul>
+              <p class="module-placeholder-meta">
+                Available with the Core module · UI surfaces here in a follow-up build.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Attendance tab -->
+        <section
+          class="tab-panel"
+          id="tab-attendance"
+          role="tabpanel"
+          aria-labelledby="tab-btn-attendance"
+          hidden
+        >
+          <div class="tab-panel-body">
+            <div class="module-placeholder module-placeholder-addon">
+              <h2>Attendance &amp; Leave</h2>
+              <p>
+                Mobile-only clock-in/out with GPS + photo verification, shift
+                management, and leave requests &amp; approvals.
+              </p>
+              <ul class="module-placeholder-list">
+                <li>Shift-aware live roster with on-shift edge indicator</li>
+                <li>Leave approval queue with bulk actions</li>
+                <li>Geofence and induction validation summary</li>
+              </ul>
+              <p class="module-placeholder-meta">
+                Requires the Attendance module in the active subscription.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- HSE tab -->
+        <section
+          class="tab-panel"
+          id="tab-hse"
+          role="tabpanel"
+          aria-labelledby="tab-btn-hse"
+          hidden
+        >
+          <div class="tab-panel-body">
+            <div class="module-placeholder module-placeholder-addon">
+              <h2>HSE + Man Hours</h2>
+              <p>
+                Safety violations, man-hour aggregation, inductions, work
+                permits, and license tracking.
+              </p>
+              <ul class="module-placeholder-list">
+                <li>Violation log with photo evidence</li>
+                <li>Man-hours aggregation by site / department</li>
+                <li>Induction and licence expiry matrix</li>
+              </ul>
+              <p class="module-placeholder-meta">
+                Requires the HSE module in the active subscription.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Payroll tab -->
+        <section
+          class="tab-panel"
+          id="tab-payroll"
+          role="tabpanel"
+          aria-labelledby="tab-btn-payroll"
+          hidden
+        >
+          <div class="tab-panel-body">
+            <div class="module-placeholder module-placeholder-addon">
+              <h2>Payroll</h2>
+              <p>
+                Payroll runs, payslips, overtime, PPh 21, and BPJS deductions —
+                calculated correctly every cycle.
+              </p>
+              <ul class="module-placeholder-list">
+                <li>Payroll run lifecycle with preview &amp; approval</li>
+                <li>Per-employee payslip viewer with YTD totals</li>
+                <li>PPh 21 bracket and BPJS rate settings</li>
+              </ul>
+              <p class="module-placeholder-meta">
+                Requires the Payroll module in the active subscription.
+              </p>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+    </div>
+  </div>
+
+  <script src="{% static 'js/dashboard.js' %}"></script>
+</body>
+</html>

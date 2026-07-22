@@ -22,7 +22,7 @@ from apps.users.services.auth import AuthService
 def login_view(request: HttpRequest) -> HttpResponse:
     """Render the login form and authenticate a session on submit."""
     if request.user.is_authenticated:
-        return redirect("web-home")
+        return redirect("web-dashboard")
 
     if request.method != "POST":
         return render(request, "auth/login.html")
@@ -38,7 +38,7 @@ def login_view(request: HttpRequest) -> HttpResponse:
 
     django_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
     messages.success(request, "Signed in successfully.")
-    return redirect("web-home")
+    return redirect("web-dashboard")
 
 
 def logout_view(request: HttpRequest) -> HttpResponse:

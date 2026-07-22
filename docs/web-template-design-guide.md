@@ -24,7 +24,7 @@ The guide covers:
 3. **Key Layout Features** — Density Toggles, Slide-over Drawers
 4. **Color Palette Strategy** — authoritative, professional, clean
 5. **Typography** — font choices and the type scale for data screens
-6. **Component Catalog** — tables, drawers, badges, command palette, etc.
+6. **Component Catalog** — tables, drawers, command palette, etc.
 7. **Shift-Aware UI** — how the interface reflects the live state of the workforce
 8. **Data Contracts** — the API surfaces each view consumes
 9. **Accessibility** — keyboard, contrast, motion
@@ -66,7 +66,7 @@ The interface must always answer three questions at a glance:
    paginate below 25 just to look "clean".
 2. **Predictable Affordances** — every table row looks like a row, every
    drawer looks like a drawer, no creative reinterpretations of basic UI.
-3. **Status Over Decoration** — status badges and icons convey state. No
+3. **Status Over Decoration** — status labels and icons convey state. No
    decorative emoji, no motivational illustrations, no animated mascots.
 4. **Read > Write > Edit Hierarchy** — the dashboard is optimized for *looking*
    at data. Editing is precise, modal, and one-field-at-a-time when possible.
@@ -248,7 +248,7 @@ fixed roles:
 - **CSS Grid** is mandatory for any **multi-column** content grid:
   page-header split, stat tile grids, drawer tab grid, table toolbar split.
 - **Flexbox** is for **single-axis alignment only**: top-bar items, sidebar
-  nav rows, list items inside a card, badge groups.
+  nav rows, list items inside a card, label groups.
 - Mixing roles (a `display: grid` row whose only columns are aligned
   one-axis) is a smell — switch to flexbox.
 
@@ -289,7 +289,7 @@ them from the first commit, not retrofitted later.
   full row. Never use only colour.
 - **Section headers** ("CORE", "ADD-ONS") — `12px / 700 / 0.05em / --color-text-subtle`.
   Hide section headers when the sidebar is collapsed.
-- **Module-gated entries**: a tier badge on the right side of the item,
+- **Module-gated entries**: a tier indicator on the right side of the item,
   `--color-warning` background with the label "ADD-ON" — when the company's
   subscription doesn't include the module, clicking opens an upgrade dialog
   rather than navigating to the page.
@@ -388,7 +388,7 @@ Compact mode if scanning tests show measurable benefit.
 |-------------|-----------|
 | Identifier (`emp_number`) | Monospace-feeling numerals, 13px, `--color-text-subtle` |
 | Name (`first_name + last_name`) | `--color-text`, weight 500; click target opens the drawer |
-| Status (`status`, `employment_type`) | Status badge, see §5.1.4 |
+| Status (`status`, `employment_type`) | Status label, see §5.1.4 |
 | Money (`base_salary`) | Right-aligned, tabular numerals, locale-formatted (Rp 10.000.000) |
 | Date (`join_date`) | `--color-text-muted`, ISO short format (`2024-03-15`) |
 | Foreign key (department, position) | `--color-text-muted`, link to detail in future |
@@ -399,7 +399,7 @@ in the toolbar. Persist per-user, per-table to `localStorage` under
 `nexus.columns.<table-name>`. Default column set is documented per screen in
 the [Component Catalog](#8-component-catalog).
 
-#### 5.1.4 Status Badge System
+#### 5.1.4 Status Label System
 
 Status is always colour + label + (optional) icon. Never colour alone
 ([WCAG 1.4.1](https://www.w3.org/WAI/WCAG21/Understanding/use-of-color.html)).
@@ -413,8 +413,8 @@ Status is always colour + label + (optional) icon. Never colour alone
 | Terminated / Rejected | `--color-danger` @ 15% | `--color-danger` lighter tone | ✕ cross |
 | Verified document | `--color-success` @ 15% | `--color-success` lighter tone | ✓ check |
 
-Badge shape: `border-radius: 999px`, vertical padding 2px, horizontal padding
-8px, font 11px / 600 / `0.04em` letter-spacing. Always uppercase in the badge
+Label shape: `border-radius: 999px`, vertical padding 2px, horizontal padding
+8px, font 11px / 600 / `0.04em` letter-spacing. Always uppercase in the label
 body — `Active` not `active`.
 
 #### 5.1.5 Row Interactions
@@ -579,20 +579,20 @@ use a neutral token or `--color-primary` instead.
 
 No single screen should display more than three accent hues simultaneously,
 where "accent hue" means any of: `--color-primary`, `--color-accent`,
-`--color-success`, `--color-warning`, `--color-danger`. A status badge
+`--color-success`, `--color-warning`, `--color-danger`. A status label
 ("Active") on a row in a table with a focused row (primary) and a
 notification toast (success) is fine — that's three. A fourth would be visual
 overload.
 
-### 6.6 Status Badge Colour Map
+### 6.6 Status Label Colour Map
 
 Already defined in [docs/ui-ux-brief.md §2](ui-ux-brief.md). The **additional
 guidance** for tables:
 
 - Row backgrounds never get tinted in a status colour. Use a left-edge accent
   bar (3px, full row height) in the status colour, instead.
-- Two status badges in the same row must be visually distinguishable — don't put a
-  warning badge directly next to a danger badge without a separator.
+- Two status labels in the same row must be visually distinguishable — don't put a
+  warning label directly next to a danger label without a separator.
 
 ### 6.7 Dark vs. Light
 
@@ -642,7 +642,7 @@ The scale in [docs/ui-ux-brief.md §3](ui-ux-brief.md) is the system. The
 | Table row primary | 14px | 500 | Names, identifiers |
 | Table row secondary | 13px | 400 | Sub-text in same cell |
 | Table header | 12px | 600 | Uppercase, 0.05em letter-spacing |
-| Status badge | 11px | 600 | Uppercase, 0.04em |
+| Status label | 11px | 600 | Uppercase, 0.04em |
 | Tabular numerals | inherit | inherit | `font-variant-numeric: tabular-nums` on all money, dates, counters |
 | Drawer title | 20px | 700 | Employee full name |
 | Drawer subtitle | 13px | 400 | emp_number · position |
@@ -677,8 +677,8 @@ live in `ui-ux-brief.md`.
 | Name | `first_name + last_name` | Avatar + name + email subline |
 | Department | `department_name` (from `department.name`) | Link to department view (V2) |
 | Position | `position_title` | Muted text |
-| Status | `status` | Badge — Active/Inactive/Resigned/Terminated |
-| Employment | `employment_type` | Badge — Permanent/Contract/Probation/Part-time/Intern |
+| Status | `status` | Label — Active/Inactive/Resigned/Terminated |
+| Employment | `employment_type` | Label — Permanent/Contract/Probation/Part-time/Intern |
 | Joined | `join_date` | ISO short |
 | Base Salary | `base_salary` | Locale-formatted, HR Admin only |
 | Actions | — | Trailing ⋯ menu |
@@ -713,7 +713,7 @@ triage mode or comfortable for review mode (§5.1.1).
 1. **Identity Card** — name, emp_number, photo (or initials avatar), email,
    mobile phone, gender, DOB, place of birth.
 2. **Employment Card** — department, position, level, manager, join date,
-   employment type, status badge.
+   employment type, status label.
 3. **Salary Card** (HR Admin only) — base salary, salary band
    (`Position.base_salary_min`–`max`), last updated.
 4. **Address Card** — residential address, ID-card address.
@@ -728,13 +728,13 @@ triage mode or comfortable for review mode (§5.1.1).
 
 Renders inside the Documents tab of the Employee drawer. Shows:
 
-- Document type (`doc_type`) badge (KTP, NPWP, Contract, Ijazah, SIM,
+- Document type (`doc_type`) label (KTP, NPWP, Contract, Ijazah, SIM,
   Sertifikat, Other)
 - File name + size + MIME type
 - Upload date (`created_at`) and uploader
 - Expiry date (`valid_until`) — with a coloured countdown: green > 30 days,
   amber ≤ 30 days, red ≤ 7 days or expired
-- Verified status badge
+- Verified status label
 - Signed URL preview link — never expose raw `file_url`
 - Actions: Download (signed URL), Verify / Unverify (HR Admin), Delete (HR
   Admin, soft)
@@ -851,7 +851,7 @@ allowed on a table row.
 | On shift right now | `--color-success`, 3px, no animation |
 | Scheduled but not clocked in | `--color-primary`, 3px |
 | Off shift | none |
-| On leave | none (status badge says so) |
+| On leave | none (status label says so) |
 
 ### 9.4 Shift-Transition Banner
 
@@ -940,7 +940,7 @@ menu.
   to the drawer title.
 - Table → `<table>` with `<caption>` describing the data, `<th scope="col">`
   for headers, `aria-sort` on sortable columns.
-- Status badges → `aria-label` describing the full state, e.g.
+- Status labels → `aria-label` describing the full state, e.g.
   `aria-label="Status: Active"`.
 - Live regions → toast notifications use `aria-live="polite"`.
 
@@ -948,7 +948,7 @@ menu.
 
 Every status colour is paired with either an icon or a text label per the
 WCAG 1.4.1 rule. In the table, a "Resigned" row carries both a grey status
-badge **and** the text "Resigned". If the badge is the only visible element,
+label **and** the text "Resigned". If the label is the only visible element,
 an icon is added.
 
 ---
@@ -1006,7 +1006,7 @@ static/
 │   ├── table.css                 ← table + density modes
 │   ├── drawer.css                ← slide-over drawer
 │   ├── forms.css                 ← inputs, validation
-│   ├── badges.css                ← status badges
+│   ├── labels.css                ← status labels
 │   ├── nav.css                   ← sidebar nav
 │   └── responsive.css            ← media queries
 └── js/
