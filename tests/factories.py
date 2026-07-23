@@ -25,6 +25,19 @@ if TYPE_CHECKING:
     from apps.departments.models import Department, Position
     from apps.employees.models import Employee
     from apps.users.models import AuthUser
+    from apps.attendance.models import (  # noqa: F401  (used by factories below)
+        AttendanceDispute,
+        AttendanceLog,
+        LeaveBalance,
+        LeaveRequest,
+        LeaveType,
+        Project,
+        ProjectAssignment,
+        Shift,
+        ShiftAssignment,
+        Site,
+        SiteAssignment,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -281,3 +294,199 @@ class EmployeeFactory(factory.django.DjangoModelFactory):
     termination_reason = ""
     base_salary = Decimal("10000000.00")
     direct_manager = None
+
+
+# ---------------------------------------------------------------------------
+# Attendance module factories
+#
+# Each factory is keyed to its model's natural default state — a working
+# employee with a known shift, an open log for today, a fresh leave
+# balance for the current year. Tests that need off-default behavior
+# (out-of-range GPS, expired offline timestamps, exhausted balances) set
+# fields explicitly after creation; they should not mutate the factory
+# defaults in a way that hides negative-path intent.
+# ---------------------------------------------------------------------------
+
+# Reference company constants for default values. Imported at module load so
+# factory defaults stay in sync with the production constants used by
+# services/validators — never duplicate these numbers as literals.
+from apps.companies.constants import (
+    DEFAULT_ANNUAL_LEAVE_DAYS,
+    DEFAULT_GEOFENCE_RADIUS_METERS,
+)
+
+
+class ShiftFactory(factory.django.DjangoModelFactory):
+    """Factory for Shift — standard 09:00–17:00 day shift."""
+
+    class Meta:
+        model = "attendance.Shift"
+
+    company = factory.SubFactory(CompanyFactory)
+    name = factory.Sequence(lambda n: f"Shift {n}")
+    start_time = time(9, 0)
+    end_time = time(17, 0)
+
+
+class ShiftAssignmentFactory(factory.django.DjangoModelFactory):
+    """Factory for ShiftAssignment — open assignment (effective_until=None)."""
+
+    class Meta:
+        model = "attendance.ShiftAssignment"
+
+    company = factory.SelfAttribute("employee.company")
+    employee = factory.SubFactory(EmployeeFactory)
+    shift = factory.SubFactory(ShiftFactory)
+    effective_from = factory.LazyFunction(date.today)
+    effective_until = None  # open assignment
+
+
+class AttendanceLogFactory(factory.django.DjangoModelFactory):
+    """Factory for AttendanceLog — PENDING log for today's work_date.
+
+    GPS defaults to a point inside a generic Jakarta office geofence
+    (-6.200, 106.817). Tests asserting geofence rejection override these
+    to coordinates far outside the radius.
+    """
+
+    class Meta:
+        model = "attendance.AttendanceLog"
+
+    company = factory.SelfAttribute("employee.company")
+    employee = factory.SubFactory(EmployeeFactory)
+    work_date = factory.LazyFunction(date.today)
+    clock_in_at = None
+    clock_out_at = None
+    clock_in_lat = Decimal("-6.200000")
+    clock_in_lng = Decimal("106.816666")
+    clock_out_lat = None
+    clock_out_lng = None
+    clock_in_photo_key = ""
+    clock_out_photo_key = ""
+    shift = None
+    site = None
+    status = "pending"
+    is_offline_sync = False
+    total_overtime_hours = Decimal("0.00")
+    is_corrected = False
+
+
+class LeaveTypeFactory(factory.django.DjangoModelFactory):
+    """Factory for LeaveType — annual leave with statutory default."""
+
+    class Meta:
+        model = "attendance.LeaveType"
+
+    company = factory.SubFactory(CompanyFactory)
+    name = factory.Sequence(lambda n: f"Leave Type {n}")
+    default_days = DEFAULT_ANNUAL_LEAVE_DAYS
+    carry_over_allowed = False
+
+
+class LeaveRequestFactory(factory.django.DjangoModelFactory):
+    """Factory for LeaveRequest — PENDING request starting today."""
+
+    class Meta:
+        model = "attendance.LeaveRequest"
+
+    company = factory.SelfAttribute("employee.company")
+    employee = factory.SubFactory(EmployeeFactory)
+    leave_type = factory.SubFactory(LeaveTypeFactory)
+    start_date = factory.LazyFunction(date.today)
+    end_date = factory.LazyFunction(date.today)
+    reason = ""
+    status = "pending"
+    approved_by = None
+    decided_at = None
+    rejection_reason = ""
+
+
+class LeaveBalanceFactory(factory.django.DjangoModelFactory):
+    """Factory for LeaveBalance — fresh annual balance for the current year.
+
+    ``quota_days`` defaults to the company statutory minimum; tests that
+    exercise exhausted balances set it explicitly to ``Decimal("0")`` or
+    similar.
+    """
+
+    class Meta:
+        model = "attendance.LeaveBalance"
+
+    company = factory.SelfAttribute("employee.company")
+    employee = factory.SubFactory(EmployeeFactory)
+    leave_type = factory.SubFactory(LeaveTypeFactory)
+    year = factory.LazyFunction(date.today().year)
+    quota_days = Decimal(str(DEFAULT_ANNUAL_LEAVE_DAYS))
+    used_days = Decimal("0")
+    carry_over_days = Decimal("0")
+
+
+class SiteFactory(factory.django.DjangoModelFactory):
+    """Factory for Site — Jakarta office with company-default geofence."""
+
+    class Meta:
+        model = "attendance.Site"
+
+    company = factory.SubFactory(CompanyFactory)
+    name = factory.Sequence(lambda n: f"Site {n}")
+    code = factory.Sequence(lambda n: f"SITE{n:04d}")
+    latitude = Decimal("-6.200000")
+    longitude = Decimal("106.816666")
+    geofence_radius_meters = DEFAULT_GEOFENCE_RADIUS_METERS
+    status = "active"
+
+
+class SiteAssignmentFactory(factory.django.DjangoModelFactory):
+    """Factory for SiteAssignment — open assignment (effective_until=None)."""
+
+    class Meta:
+        model = "attendance.SiteAssignment"
+
+    company = factory.SelfAttribute("employee.company")
+    employee = factory.SubFactory(EmployeeFactory)
+    site = factory.SubFactory(SiteFactory)
+    effective_from = factory.LazyFunction(date.today)
+    effective_until = None  # open assignment
+
+
+class ProjectFactory(factory.django.DjangoModelFactory):
+    """Factory for Project — independent of a site by default."""
+
+    class Meta:
+        model = "attendance.Project"
+
+    company = factory.SubFactory(CompanyFactory)
+    name = factory.Sequence(lambda n: f"Project {n}")
+    code = factory.Sequence(lambda n: f"PRJ{n:04d}")
+    site = None
+    status = "active"
+
+
+class ProjectAssignmentFactory(factory.django.DjangoModelFactory):
+    """Factory for ProjectAssignment — open assignment (effective_until=None)."""
+
+    class Meta:
+        model = "attendance.ProjectAssignment"
+
+    company = factory.SelfAttribute("employee.company")
+    employee = factory.SubFactory(EmployeeFactory)
+    project = factory.SubFactory(ProjectFactory)
+    effective_from = factory.LazyFunction(date.today)
+    effective_until = None  # open assignment
+
+
+class AttendanceDisputeFactory(factory.django.DjangoModelFactory):
+    """Factory for AttendanceDispute — OPEN dispute raised by the log's owner."""
+
+    class Meta:
+        model = "attendance.AttendanceDispute"
+
+    company = factory.SelfAttribute("attendance_log.company")
+    attendance_log = factory.SubFactory(AttendanceLogFactory)
+    raised_by = factory.SelfAttribute("attendance_log.employee")
+    reason = "Clock-in timestamp does not match reality."
+    evidence_photo_key = ""
+    status = "open"
+    resolved_by = None
+    resolved_at = None
+    resolution_note = ""

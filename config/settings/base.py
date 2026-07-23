@@ -184,6 +184,8 @@ SPECTACULAR_SETTINGS = {
 
 
 # # ── Celery ────────────────────────────────────────────────────────────────────
+# from celery.schedules import crontab
+#
 # CELERY_BROKER_URL = env.celery_broker_url
 # CELERY_RESULT_BACKEND = env.celery_result_backend
 # CELERY_ACCEPT_CONTENT = ["json"]
@@ -194,6 +196,16 @@ SPECTACULAR_SETTINGS = {
 # CELERY_RESULT_EXTENDED = True
 # CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes per task
 # CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+#
+# CELERY_BEAT_SCHEDULE = {
+#     "compute-daily-attendance-status": {
+#         "task": "apps.attendance.tasks.compute_daily_attendance_status",
+#         # Run 23:30 Jakarta time (UTC+7 → 16:30 UTC) — after typical
+#         # end-of-day clock-outs so overnight shifts are captured.
+#         "schedule": crontab(hour=16, minute=30),
+#         "options": {"queue": "attendance"},
+#     },
+# }
 
 
 # ── Caches ───────────────────────────────────────────────────────────────────
