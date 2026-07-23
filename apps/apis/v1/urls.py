@@ -6,6 +6,7 @@ Root URL configuration for the v1 API.
 
 from django.urls import include, path
 
+from apps.apis.v1.attendance.urls import urlpatterns as attendance_patterns
 from apps.apis.v1.auth.urls import urlpatterns as auth_patterns
 from apps.apis.v1.departments.urls import urlpatterns as department_patterns
 from apps.apis.v1.documents.urls import urlpatterns as document_patterns
@@ -21,10 +22,7 @@ urlpatterns = [
     ),
     path("employees/", include((employee_patterns, "employee"))),
     path("positions/", include((position_patterns, "position"))),
-    # path("employees/", include((core_patterns, "employee"))),
-    # path("attendance-logs/", include((attendance_patterns, "attendance"))),
-    # path("shifts/", include((attendance_patterns, "shift"))),
-    # path("leave-requests/", include((attendance_patterns, "leave"))),
+    path("attendance/", include((attendance_patterns, "attendance"))),
     # path("violations/", include((hse_patterns, "violation"))),
     # path("man-hours/", include((hse_patterns, "man_hours"))),
     # path("inductions/", include((hse_patterns, "induction"))),
